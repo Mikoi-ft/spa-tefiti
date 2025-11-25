@@ -76,13 +76,6 @@ if(!id){
       startCelebration()
     }
 
-    // копировать ссылку
-    copyLinkBtn.onclick = () => {
-      navigator.clipboard.writeText(location.href)
-      copyLinkBtn.textContent = 'Скопировано!'
-      setTimeout(()=>copyLinkBtn.textContent='Скопировать ссылку',1500)
-    }
-
     // скачать PDF — используем html2canvas + jsPDF
     downloadPdfBtn.onclick = async () => {
       const el = document.querySelector('.certificate')

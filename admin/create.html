@@ -12,14 +12,12 @@
 
     <div id="auth-area">
       <div id="user-info" style="display:none;">
-        <p>Вы вошли как <span id="user-email"></span></p>
         <button id="signout">Выйти</button>
       </div>
 
       <div id="login-area">
         <p>Войдите через email (админ)</p>
         <input id="email" placeholder="Email" />
-        <button id="sendLink">Отправить ссылку для входа</button>
         <p id="loginMsg"></p>
       </div>
     </div>
@@ -71,7 +69,7 @@ const resultBox = document.getElementById('result')
 const codeOut = document.getElementById('codeOut')
 const shareLink = document.getElementById('shareLink')
 const copyLinkBtn = document.getElementById('copyLink')
-const openLinkA = document.getElementById('openLink')
+const openLinkA = document.getElementById('openLinkA')
 
 sendLinkBtn.onclick = async () => {
   const email = emailInput.value.trim()
@@ -86,17 +84,39 @@ signoutBtn.onclick = async () => {
   location.reload()
 }
 
+// проверка, админ ли пользователь
+async function checkAdmin(user) {
+  // вариант 1: если в JWT есть кастомный claim role='admin'
+  const { data: { role } } = user?.user_metadata || {}
+  if(role === 'admin') return true
+
+  // вариант 2: проверка в таблице auth.users по id и флагу is_admin
+  const { data, error } = await supabase.from('users') // таблица users должна содержать поле is_admin
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
+  return data?.is_admin === true
+}
+
 supabase.auth.onAuthStateChange(async (event, session) => {
   const user = session?.user
-  if (user) {
+  if(user){
+    const isAdmin = await checkAdmin(user)
+    if(!isAdmin){
+      loginMsg.textContent = 'У вас нет прав администратора.'
+      userInfo.style.display = 'none'
+      createForm.style.display = 'none'
+      document.getElementById('login-area').style.display = 'block'
+      return
+    }
     userInfo.style.display = 'block'
     document.getElementById('login-area').style.display = 'none'
     userEmailEl.textContent = user.email
     createForm.style.display = 'block'
   } else {
     userInfo.style.display = 'none'
-    document.getElementById('login-area').style.display = 'block'
     createForm.style.display = 'none'
+    document.getElementById('login-area').style.display = 'block'
   }
 })
 
@@ -108,16 +128,12 @@ function randomCode(len=10){
 }
 
 async function uniqueCode(){
-  // пытаемся найти уникальный код, делаем несколько попыток
   for(let i=0;i<8;i++){
     const c = randomCode(10)
     const { data, error } = await supabase.from('certificates').select('id').eq('code', c).limit(1)
-    if(error) {
-      console.error(error); break
-    }
+    if(error) { console.error(error); break }
     if(!data || data.length===0) return c
   }
-  // fallback
   return randomCode(12)
 }
 
@@ -128,7 +144,6 @@ createForm.onsubmit = async (e) => {
   const date = dateInput.value || null
   if(!full_name){ alert('Введите ФИО'); return }
   const code = await uniqueCode()
-  const user = supabase.auth.getUser().then(r=>r.data.user).catch(()=>null)
   const userId = (await supabase.auth.getUser()).data?.user?.id || null
   const { data, error } = await supabase.from('certificates').insert([{
     code,
@@ -137,7 +152,7 @@ createForm.onsubmit = async (e) => {
     date,
     created_by: userId
   }]).select().single()
-  if (error){ alert('Ошибка при сохранении: '+error.message); console.error(error); return }
+  if(error){ alert('Ошибка при сохранении: '+error.message); console.error(error); return }
   codeOut.textContent = data.code
   const link = `${location.origin}/certificate/view.html?id=${data.id}`
   shareLink.value = link
@@ -146,7 +161,6 @@ createForm.onsubmit = async (e) => {
   resultBox.style.display = 'block'
 }
 
-// копирование
 copyLinkBtn.onclick = () => {
   shareLink.select()
   document.execCommand('copy')
