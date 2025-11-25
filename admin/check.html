@@ -10,19 +10,19 @@
   <main class="container">
     <h1>Проверка подлинности (админ)</h1>
 
-    <div id="auth-area">
-      <div id="user-info" style="display:none;">
-        <p>Вы вошли как <span id="user-email"></span></p>
-        <button id="signout">Выйти</button>
-      </div>
+   <div id="auth-area">
+  <div id="login-area">
+    <p>Введите пароль администратора</p>
+    <input id="adminPassword" type="password" placeholder="Пароль" />
+    <button id="loginBtn">Войти</button>
+    <p id="loginMsg" style="color:red;"></p>
+  </div>
 
-      <div id="login-area">
-        <p>Войдите через email (админ)</p>
-        <input id="email" placeholder="Email" />
-        <button id="sendLink">Отправить ссылку для входа</button>
-        <p id="loginMsg"></p>
-      </div>
-    </div>
+  <div id="user-info" style="display:none;">
+    <p>Вы вошли как админ</p>
+    <button id="signout">Выйти</button>
+  </div>
+</div>
 
     <hr />
 
