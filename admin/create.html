@@ -7,63 +7,66 @@
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="page">
-  <main class="container">
-    <h1>Админ — Создание сертификата</h1>
+<main class="container">
+  <h1>Админ — Создание сертификата</h1>
 
-    <div id="auth-area">
-  <div id="login-area">
-    <p>Введите пароль администратора</p>
-    <input id="adminPassword" type="password" placeholder="Пароль" />
-    <button id="loginBtn">Войти</button>
-    <p id="loginMsg" style="color:red;"></p>
-  </div>
-
-  <div id="user-info" style="display:none;">
-    <p>Вы вошли как админ</p>
-    <button id="signout">Выйти</button>
-  </div>
-</div>
-
-    <hr />
-
-    <form id="createForm" style="display:none;">
-      <label>ФИО:
-        <input id="full_name" required />
-      </label>
-
-      <label>Программа / Стоимость:
-        <input id="program" placeholder="Например: SPA-релакс — 60$" />
-      </label>
-
-      <label>Дата (дата использования):
-        <input id="date" type="date" />
-      </label>
-
-      <button type="submit">Создать сертификат</button>
-    </form>
-
-    <div id="result" style="display:none;">
-      <p>Сертификат создан!</p>
-      <p>Код: <b id="codeOut"></b></p>
-      <p>Ссылка: <input id="shareLink" readonly style="width:100%"/></p>
-      <button id="copyLink">Скопировать ссылку</button>
-      <a id="openLink" target="_blank">Открыть ссылку</a>
+  <!-- Авторизация -->
+  <div id="auth-area">
+    <div id="login-area">
+      <p>Введите пароль администратора</p>
+      <input id="adminPassword" type="password" placeholder="Пароль" />
+      <button id="loginBtn">Войти</button>
+      <p id="loginMsg" style="color:red;"></p>
     </div>
-  </main>
+
+    <div id="user-info" style="display:none;">
+      <p>Вы вошли как админ</p>
+      <button id="signout">Выйти</button>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- Форма создания сертификата -->
+  <form id="createForm" style="display:none;">
+    <label>ФИО:
+      <input id="full_name" required />
+    </label>
+
+    <label>Программа / Стоимость:
+      <input id="program" placeholder="Например: SPA-релакс — 60$" />
+    </label>
+
+    <label>Дата (дата использования):
+      <input id="date" type="date" />
+    </label>
+
+    <button type="submit">Создать сертификат</button>
+  </form>
+
+  <div id="result" style="display:none;">
+    <p>Сертификат создан!</p>
+    <p>Код: <b id="codeOut"></b></p>
+    <p>Ссылка: <input id="shareLink" readonly style="width:100%"/></p>
+    <button id="copyLink">Скопировать ссылку</button>
+    <a id="openLink" target="_blank">Открыть ссылку</a>
+  </div>
+</main>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
+import bcrypt from 'https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-const emailInput = document.getElementById('email')
-const sendLinkBtn = document.getElementById('sendLink')
+const loginBtn = document.getElementById('loginBtn')
+const passwordInput = document.getElementById('adminPassword')
 const loginMsg = document.getElementById('loginMsg')
 const userInfo = document.getElementById('user-info')
-const userEmailEl = document.getElementById('user-email')
-const signoutBtn = document.getElementById('signout')
+const loginArea = document.getElementById('login-area')
 const createForm = document.getElementById('createForm')
+const signoutBtn = document.getElementById('signout')
 const fullNameInput = document.getElementById('full_name')
 const programInput = document.getElementById('program')
 const dateInput = document.getElementById('date')
@@ -71,59 +74,11 @@ const resultBox = document.getElementById('result')
 const codeOut = document.getElementById('codeOut')
 const shareLink = document.getElementById('shareLink')
 const copyLinkBtn = document.getElementById('copyLink')
-const openLinkA = document.getElementById('openLinkA')
+const openLinkA = document.getElementById('openLink')
 
-sendLinkBtn.onclick = async () => {
-  const email = emailInput.value.trim()
-  if(!email){ loginMsg.textContent = 'Введите email'; return }
-  const { error } = await supabase.auth.signInWithOtp({ email })
-  if (error) loginMsg.textContent = 'Ошибка: ' + error.message
-  else loginMsg.textContent = 'Ссылка для входа отправлена на email.'
-}
-
-signoutBtn.onclick = async () => {
-  await supabase.auth.signOut()
-  location.reload()
-}
-
-// проверка, админ ли пользователь
-async function checkAdmin(user) {
-  // вариант 1: если в JWT есть кастомный claim role='admin'
-  const { data: { role } } = user?.user_metadata || {}
-  if(role === 'admin') return true
-
-  // вариант 2: проверка в таблице auth.users по id и флагу is_admin
-  const { data, error } = await supabase.from('users') // таблица users должна содержать поле is_admin
-    .select('is_admin')
-    .eq('id', user.id)
-    .single()
-  return data?.is_admin === true
-}
-
-supabase.auth.onAuthStateChange(async (event, session) => {
-  const user = session?.user
-  if(user){
-    const isAdmin = await checkAdmin(user)
-    if(!isAdmin){
-      loginMsg.textContent = 'У вас нет прав администратора.'
-      userInfo.style.display = 'none'
-      createForm.style.display = 'none'
-      document.getElementById('login-area').style.display = 'block'
-      return
-    }
-    userInfo.style.display = 'block'
-    document.getElementById('login-area').style.display = 'none'
-    userEmailEl.textContent = user.email
-    createForm.style.display = 'block'
-  } else {
-    userInfo.style.display = 'none'
-    createForm.style.display = 'none'
-    document.getElementById('login-area').style.display = 'block'
-  }
-})
-
+// Функция генерации случайного кода
 function randomCode(len=10){
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789' // без похожих символов
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
   let s = ''
   for(let i=0;i<len;i++) s += chars[Math.floor(Math.random()*chars.length)]
   return s
@@ -132,29 +87,59 @@ function randomCode(len=10){
 async function uniqueCode(){
   for(let i=0;i<8;i++){
     const c = randomCode(10)
-    const { data, error } = await supabase.from('certificates').select('id').eq('code', c).limit(1)
-    if(error) { console.error(error); break }
+    const { data } = await supabase.from('certificates').select('id').eq('code', c).limit(1)
     if(!data || data.length===0) return c
   }
   return randomCode(12)
 }
 
+// Вход по паролю
+loginBtn.onclick = async () => {
+  const pw = passwordInput.value.trim()
+  if(!pw){ loginMsg.textContent = 'Введите пароль'; return }
+
+  // Берём хэш пароля из таблицы admins
+  const { data, error } = await supabase.from('admins').select('password_hash').limit(1).single()
+  if(error || !data){ loginMsg.textContent = 'Ошибка проверки пароля'; return }
+
+  const isValid = bcrypt.compareSync(pw, data.password_hash)
+  if(isValid){
+    loginArea.style.display = 'none'
+    userInfo.style.display = 'block'
+    createForm.style.display = 'block'
+    loginMsg.textContent = ''
+  } else {
+    loginMsg.textContent = 'Неверный пароль'
+  }
+}
+
+// Выход
+signoutBtn.onclick = () => {
+  passwordInput.value = ''
+  loginMsg.textContent = ''
+  createForm.style.display = 'none'
+  userInfo.style.display = 'none'
+  loginArea.style.display = 'block'
+}
+
+// Создание сертификата
 createForm.onsubmit = async (e) => {
   e.preventDefault()
   const full_name = fullNameInput.value.trim()
   const program = programInput.value.trim()
   const date = dateInput.value || null
   if(!full_name){ alert('Введите ФИО'); return }
+
   const code = await uniqueCode()
-  const userId = (await supabase.auth.getUser()).data?.user?.id || null
   const { data, error } = await supabase.from('certificates').insert([{
     code,
     full_name,
     program,
-    date,
-    created_by: userId
+    date
   }]).select().single()
+
   if(error){ alert('Ошибка при сохранении: '+error.message); console.error(error); return }
+
   codeOut.textContent = data.code
   const link = `${location.origin}/certificate/view.html?id=${data.id}`
   shareLink.value = link
@@ -163,6 +148,7 @@ createForm.onsubmit = async (e) => {
   resultBox.style.display = 'block'
 }
 
+// Копирование ссылки
 copyLinkBtn.onclick = () => {
   shareLink.select()
   document.execCommand('copy')
@@ -170,6 +156,5 @@ copyLinkBtn.onclick = () => {
   setTimeout(()=>copyLinkBtn.textContent='Скопировать ссылку',1500)
 }
 </script>
-
 </body>
 </html>

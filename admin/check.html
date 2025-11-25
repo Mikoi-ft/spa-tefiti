@@ -7,79 +7,92 @@
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <main class="container">
-    <h1>Проверка подлинности (админ)</h1>
+<main class="container">
+  <h1>Проверка подлинности (админ)</h1>
 
-   <div id="auth-area">
-  <div id="login-area">
-    <p>Введите пароль администратора</p>
-    <input id="adminPassword" type="password" placeholder="Пароль" />
-    <button id="loginBtn">Войти</button>
-    <p id="loginMsg" style="color:red;"></p>
-  </div>
-
-  <div id="user-info" style="display:none;">
-    <p>Вы вошли как админ</p>
-    <button id="signout">Выйти</button>
-  </div>
-</div>
-
-    <hr />
-
-    <div id="checker" style="display:none">
-      <input id="codeInput" placeholder="Введите уникальный код (например ABC123...)" style="width:60%"/>
-      <button id="checkBtn">Проверить</button>
-      <div id="checkResult"></div>
+  <!-- Авторизация -->
+  <div id="auth-area">
+    <div id="login-area">
+      <p>Введите пароль администратора</p>
+      <input id="adminPassword" type="password" placeholder="Пароль" />
+      <button id="loginBtn">Войти</button>
+      <p id="loginMsg" style="color:red;"></p>
     </div>
-  </main>
+
+    <div id="user-info" style="display:none;">
+      <p>Вы вошли как админ</p>
+      <button id="signout">Выйти</button>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- Блок проверки сертификата -->
+  <div id="checker" style="display:none">
+    <input id="codeInput" placeholder="Введите уникальный код (например ABC123...)" style="width:60%"/>
+    <button id="checkBtn">Проверить</button>
+    <div id="checkResult"></div>
+  </div>
+</main>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
+import bcrypt from 'https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js'
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-const emailInput = document.getElementById('email')
-const sendLinkBtn = document.getElementById('sendLink')
+const loginBtn = document.getElementById('loginBtn')
+const passwordInput = document.getElementById('adminPassword')
 const loginMsg = document.getElementById('loginMsg')
 const userInfo = document.getElementById('user-info')
-const userEmailEl = document.getElementById('user-email')
+const loginArea = document.getElementById('login-area')
 const signoutBtn = document.getElementById('signout')
 const checker = document.getElementById('checker')
 
-sendLinkBtn.onclick = async () => {
-  const email = emailInput.value.trim()
-  if(!email){ loginMsg.textContent = 'Введите email'; return }
-  const { error } = await supabase.auth.signInWithOtp({ email })
-  if (error) loginMsg.textContent = 'Ошибка: ' + error.message
-  else loginMsg.textContent = 'Ссылка для входа отправлена на email.'
-}
+// Вход по паролю
+loginBtn.onclick = async () => {
+  const pw = passwordInput.value.trim()
+  if(!pw){ loginMsg.textContent = 'Введите пароль'; return }
 
-signoutBtn.onclick = async () => {
-  await supabase.auth.signOut()
-  location.reload()
-}
+  // Получаем хэш пароля из таблицы admins
+  const { data, error } = await supabase.from('admins').select('password_hash').limit(1).single()
+  if(error || !data){ loginMsg.textContent = 'Ошибка проверки пароля'; return }
 
-supabase.auth.onAuthStateChange(async (event, session) => {
-  const user = session?.user
-  if (user) {
+  const isValid = bcrypt.compareSync(pw, data.password_hash)
+  if(isValid){
+    loginArea.style.display = 'none'
     userInfo.style.display = 'block'
-    document.getElementById('login-area').style.display = 'none'
-    userEmailEl.textContent = user.email
     checker.style.display = 'block'
+    loginMsg.textContent = ''
   } else {
-    userInfo.style.display = 'none'
-    document.getElementById('login-area').style.display = 'block'
-    checker.style.display = 'none'
+    loginMsg.textContent = 'Неверный пароль'
   }
-})
+}
 
+// Выход
+signoutBtn.onclick = () => {
+  passwordInput.value = ''
+  loginMsg.textContent = ''
+  userInfo.style.display = 'none'
+  checker.style.display = 'none'
+  loginArea.style.display = 'block'
+}
+
+// Проверка сертификата
 document.getElementById('checkBtn').onclick = async () => {
   const code = document.getElementById('codeInput').value.trim()
   if(!code){ alert('Введите код'); return }
+
   const { data, error } = await supabase.from('certificates').select('*').eq('code', code).limit(1).single()
   const resDiv = document.getElementById('checkResult')
-  if(error || !data){ resDiv.innerHTML = '<p style="color:red">Сертификат не найден или код неверный</p>'; return }
-  resDiv.innerHTML = `<p style="color:green">Действительный сертификат</p>
+  if(error || !data){
+    resDiv.innerHTML = '<p style="color:red">Сертификат не найден или код неверный</p>'
+    return
+  }
+
+  resDiv.innerHTML = `
+    <p style="color:green">Действительный сертификат</p>
     <p>ФИО: ${data.full_name}</p>
     <p>Программа: ${data.program || '-'}</p>
     <p>Дата: ${data.date ? new Date(data.date).toLocaleDateString() : '-'}</p>
