@@ -53,10 +53,16 @@
   </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js"></script>
+<script type="module">
+  // Теперь bcrypt доступен глобально
+  const isValid = bcrypt.compareSync('пароль', '$2a$10$...')
+</script>
+
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
-import bcrypt from 'https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js'
+
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
@@ -180,5 +186,6 @@ copyLinkBtn.onclick = () => {
   setTimeout(()=>copyLinkBtn.textContent='Скопировать ссылку',1500)
 }
 </script>
+
 </body>
 </html>
