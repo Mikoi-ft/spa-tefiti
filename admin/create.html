@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin — Создать сертификат | Tefiti SPA</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="page">
+  <main class="container">
+    <h1>Админ — Создание сертификата</h1>
+
+    <div id="auth-area">
+      <div id="user-info" style="display:none;">
+        <p>Вы вошли как <span id="user-email"></span></p>
+        <button id="signout">Выйти</button>
+      </div>
+
+      <div id="login-area">
+        <p>Войдите через email (админ)</p>
+        <input id="email" placeholder="Email" />
+        <button id="sendLink">Отправить ссылку для входа</button>
+        <p id="loginMsg"></p>
+      </div>
+    </div>
+
+    <hr />
+
+    <form id="createForm" style="display:none;">
+      <label>ФИО:
+        <input id="full_name" required />
+      </label>
+
+      <label>Программа / Стоимость:
+        <input id="program" placeholder="Например: SPA-релакс — 60$" />
+      </label>
+
+      <label>Дата (дата использования):
+        <input id="date" type="date" />
+      </label>
+
+      <button type="submit">Создать сертификат</button>
+    </form>
+
+    <div id="result" style="display:none;">
+      <p>Сертификат создан!</p>
+      <p>Код: <b id="codeOut"></b></p>
+      <p>Ссылка: <input id="shareLink" readonly style="width:100%"/></p>
+      <button id="copyLink">Скопировать ссылку</button>
+      <a id="openLink" target="_blank">Открыть ссылку</a>
+    </div>
+  </main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const emailInput = document.getElementById('email')
+const sendLinkBtn = document.getElementById('sendLink')
+const loginMsg = document.getElementById('loginMsg')
+const userInfo = document.getElementById('user-info')
+const userEmailEl = document.getElementById('user-email')
+const signoutBtn = document.getElementById('signout')
+const createForm = document.getElementById('createForm')
+const fullNameInput = document.getElementById('full_name')
+const programInput = document.getElementById('program')
+const dateInput = document.getElementById('date')
+const resultBox = document.getElementById('result')
+const codeOut = document.getElementById('codeOut')
+const shareLink = document.getElementById('shareLink')
+const copyLinkBtn = document.getElementById('copyLink')
+const openLinkA = document.getElementById('openLink')
+
+sendLinkBtn.onclick = async () => {
+  const email = emailInput.value.trim()
+  if(!email){ loginMsg.textContent = 'Введите email'; return }
+  const { error } = await supabase.auth.signInWithOtp({ email })
+  if (error) loginMsg.textContent = 'Ошибка: ' + error.message
+  else loginMsg.textContent = 'Ссылка для входа отправлена на email.'
+}
+
+signoutBtn.onclick = async () => {
+  await supabase.auth.signOut()
+  location.reload()
+}
+
+supabase.auth.onAuthStateChange(async (event, session) => {
+  const user = session?.user
+  if (user) {
+    userInfo.style.display = 'block'
+    document.getElementById('login-area').style.display = 'none'
+    userEmailEl.textContent = user.email
+    createForm.style.display = 'block'
+  } else {
+    userInfo.style.display = 'none'
+    document.getElementById('login-area').style.display = 'block'
+    createForm.style.display = 'none'
+  }
+})
+
+function randomCode(len=10){
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789' // без похожих символов
+  let s = ''
+  for(let i=0;i<len;i++) s += chars[Math.floor(Math.random()*chars.length)]
+  return s
+}
+
+async function uniqueCode(){
+  // пытаемся найти уникальный код, делаем несколько попыток
+  for(let i=0;i<8;i++){
+    const c = randomCode(10)
+    const { data, error } = await supabase.from('certificates').select('id').eq('code', c).limit(1)
+    if(error) {
+      console.error(error); break
+    }
+    if(!data || data.length===0) return c
+  }
+  // fallback
+  return randomCode(12)
+}
+
+createForm.onsubmit = async (e) => {
+  e.preventDefault()
+  const full_name = fullNameInput.value.trim()
+  const program = programInput.value.trim()
+  const date = dateInput.value || null
+  if(!full_name){ alert('Введите ФИО'); return }
+  const code = await uniqueCode()
+  const user = supabase.auth.getUser().then(r=>r.data.user).catch(()=>null)
+  const userId = (await supabase.auth.getUser()).data?.user?.id || null
+  const { data, error } = await supabase.from('certificates').insert([{
+    code,
+    full_name,
+    program,
+    date,
+    created_by: userId
+  }]).select().single()
+  if (error){ alert('Ошибка при сохранении: '+error.message); console.error(error); return }
+  codeOut.textContent = data.code
+  const link = `${location.origin}/certificate/view.html?id=${data.id}`
+  shareLink.value = link
+  openLinkA.href = link
+  openLinkA.textContent = 'Открыть сертификат'
+  resultBox.style.display = 'block'
+}
+
+// копирование
+copyLinkBtn.onclick = () => {
+  shareLink.select()
+  document.execCommand('copy')
+  copyLinkBtn.textContent = 'Скопировано!'
+  setTimeout(()=>copyLinkBtn.textContent='Скопировать ссылку',1500)
+}
+</script>
+</body>
+</html>

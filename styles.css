@@ -1,0 +1,34 @@
+:root{
+  --bg:#f6f2ec; /* лёгкий бежевый фон */
+  --accent-dark:#0b3a2e; /* тёмно-зелёный */
+  --accent-gold:#caa94b; /* золотой */
+  --card:#fff;
+  --muted:#666;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+body{ background:var(--bg); margin:0; color:var(--accent-dark); }
+.container{ max-width:920px; margin:40px auto; padding:20px; }
+.page .center{ display:flex; justify-content:center; align-items:center; min-height:60vh; flex-direction:column; }
+
+/* card / открытка */
+.card{ width:820px; height:460px; border-radius:18px; overflow:hidden; box-shadow:0 8px 30px rgba(10,10,10,0.12); transition:transform .6s; cursor:pointer; }
+.card.closed{ transform: perspective(800px) rotateX(0deg); }
+.card .card-front{ background: linear-gradient(120deg, var(--accent-dark), #123822); color:#fff; padding:36px; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; }
+.card .card-front .logo{ width:120px; height:auto; margin-bottom:10px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+.card .card-inner{ background: linear-gradient(180deg, #fff 0%, #fefcf7 100%); padding:36px; height:100%; display:flex; align-items:center; justify-content:center; }
+.certificate{ text-align:center; border:2px dashed rgba(0,0,0,0.06); padding:24px; width:86%; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(250,246,240,0.9)); box-shadow: 0 6px 20px rgba(10,10,10,0.06); }
+.certificate h2{ font-size:28px; margin:6px 0; color:var(--accent-dark) }
+.certificate .big{ font-size:22px; font-weight:600; margin:12px 0 }
+.certificate p{ margin:6px 0; color:var(--muted) }
+
+button{ background:var(--accent-gold); border:none; padding:8px 12px; border-radius:8px; cursor:pointer; color:#fff; font-weight:600; }
+input, textarea{ padding:8px 10px; border-radius:8px; border:1px solid #ddd; }
+
+label{ display:block; margin:10px 0; }
+small{ font-size:12px; color:var(--muted) }
+
+/* responsive */
+@media (max-width:900px){
+  .card{ width:100%; height:auto }
+  .certificate{ width:95% }
+}
