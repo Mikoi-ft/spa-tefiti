@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <hr />
+
 
   <!-- Форма создания сертификата -->
   <form id="createForm" style="display:none;">
@@ -93,25 +93,49 @@ async function uniqueCode(){
   return randomCode(12)
 }
 
-// Вход по паролю
 loginBtn.onclick = async () => {
   const pw = passwordInput.value.trim()
-  if(!pw){ loginMsg.textContent = 'Введите пароль'; return }
+  if (!pw) {
+    loginMsg.textContent = 'Введите пароль'
+    return
+  }
 
-  // Берём хэш пароля из таблицы admins
-  const { data, error } = await supabase.from('admins').select('password_hash').limit(1).single()
-  if(error || !data){ loginMsg.textContent = 'Ошибка проверки пароля'; return }
+  try {
+    const { data, error } = await supabase
+      .from('admins')
+      .select('password_hash')
+      .limit(1)
+      .single()
 
-  const isValid = bcrypt.compareSync(pw, data.password_hash)
-  if(isValid){
-    loginArea.style.display = 'none'
-    userInfo.style.display = 'block'
-    createForm.style.display = 'block'
-    loginMsg.textContent = ''
-  } else {
-    loginMsg.textContent = 'Неверный пароль'
+    if (error) {
+      console.error('Ошибка запроса:', error)
+      loginMsg.textContent = 'Ошибка проверки пароля'
+      return
+    }
+
+    if (!data || !data.password_hash) {
+      loginMsg.textContent = 'Пароль не найден'
+      return
+    }
+
+    const isValid = bcrypt.compareSync(pw, data.password_hash)
+
+    if (isValid) {
+      loginArea.style.display = 'none'
+      userInfo.style.display = 'block'
+      createForm.style.display = 'block'
+      loginMsg.textContent = ''
+    } else {
+      loginMsg.textContent = 'Неверный пароль'
+    }
+
+  } catch (err) {
+    console.error('Ошибка выполнения:', err)
+    loginMsg.textContent = 'Произошла ошибка, попробуйте ещё раз'
   }
 }
+
+
 
 // Выход
 signoutBtn.onclick = () => {
