@@ -35,7 +35,7 @@
     <label>Программа / Стоимость:
       <input id="program" placeholder="Например: SPA-релакс — 60$" />
     </label>
-    <label>Дата (дата использования):
+    <label>Срок действия:
       <input id="date" type="date" />
     </label>
     <button type="submit">Создать сертификат</button>
@@ -135,8 +135,9 @@ createForm.onsubmit = async (e) => {
 
   if (error){ alert('Ошибка: ' + error.message); return }
 
-  const id = data[0].cert_id
-  const code = data[0].cert_code
+  const id = data[0].cert_id;
+  const code = data[0].cert_code;
+
 
   codeOut.textContent = code
   const link = `${location.origin}/certificate/view.html?id=${id}`
