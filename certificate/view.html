@@ -104,11 +104,13 @@ if(!id){
     front.addEventListener('click', openCard)
 
     function openCard(){
-      cardWrap.classList.remove('closed')
-      inner.style.display = 'block'
-      front.style.display = 'none'
-      startCelebration()
-    }
+  cardWrap.classList.remove('closed')
+  cardWrap.style.animation = 'none';   // ← остановить тряску
+  inner.style.display = 'block'
+  front.style.display = 'none'
+  startCelebration()
+}
+
 
     downloadPdfBtn.onclick = async () => {
       const el = document.querySelector('.certificate')

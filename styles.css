@@ -1,9 +1,9 @@
 :root{
-  --bg:#1a3a2c; /* фон страницы - насыщенный зелёный */
-  --envelope-dark:#0b2a1e; /* тёмно-зелёный конверт */
-  --envelope-gold:#caa94b; /* текст на конверте - золотой */
-  --inside-bg:#f6f2ec; /* внутренний бежевый фон */
-  --inside-text:#5a4a2f; /* тёмно-золотой / подходящий серый текст внутри */
+  --bg:#1a3a2c;
+  --envelope-dark:#0b2a1e;
+  --envelope-gold:#caa94b;
+  --inside-bg:#f6f2ec;
+  --inside-text:#5a4a2f;
   --card:#fff;
   --muted:#666;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -14,6 +14,42 @@ body{
   margin:0; 
   color:var(--envelope-gold); 
 }
+
+/* ---- КОНТЕЙНЕР С ОТДЕЛЁННОЙ ТЕНЬЮ ---- */
+#card-wrap{
+  position: relative;
+  padding: 20px;
+  display: inline-block;
+}
+
+/* Глубокая тень под конвертом (НЕ ломает центрирование) */
+#card-wrap::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  border-radius:22px;
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.25),
+    0 18px 50px rgba(0,0,0,0.18);
+}
+
+/* ---- ЛЁГКАЯ ТРЯСКА КОНВЕРТА ---- */
+@keyframes envelopeShake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+.card.closed {
+  animation: envelopeShake 0.55s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* ---------------------------------- */
 
 .container{ 
   max-width:920px; 
@@ -29,7 +65,6 @@ body{
   flex-direction:column; 
 }
 
-/* card / открытка */
 .card{ 
   width:820px; 
   height:460px; 
@@ -38,10 +73,6 @@ body{
   box-shadow:0 8px 30px rgba(10,10,10,0.12); 
   transition:transform .6s; 
   cursor:pointer; 
-}
-
-.card.closed{ 
-  transform: perspective(800px) rotateX(0deg); 
 }
 
 .card .card-front{ 
