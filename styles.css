@@ -1,36 +1,47 @@
 :root{
- --bg:#1a3a2c;
- --envelope-dark:#0b2a1e;
- --envelope-gold:#caa94b;
- --inside-bg:#f6f2ec;
- --inside-text:#5a4a2f;
- --card:#fff;
- --muted:#666;
- font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+--bg:#1a3a2c;
+--envelope-dark:#0b2a1e;
+--envelope-gold:#caa94b;
+--inside-bg:#f6f2ec;
+--inside-text:#5a4a2f;
+--card:#fff;
+--muted:#666;
+font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
 body{ 
- background:var(--bg); 
- margin:0; 
- color:var(--envelope-gold); 
+background:var(--bg); 
+margin:0; 
+color:var(--envelope-gold); 
 }
 
 /* ---- КОНТЕЙНЕР С ОТДЕЛЁННОЙ ТЕНЬЮ ---- */
 #card-wrap{
- position: relative;
- /* УДАЛЕН padding: 20px; ЧТОБЫ УБРАТЬ ЗЕЛЕНУЮ РАМКУ/ОТСТУП ВОКРУГ КОНВЕРТА */
- padding: 0; 
- display: inline-block;
+position: relative;
+padding: 0; /* ИСПРАВЛЕНО */
+display: inline-block;
+}
+
+/* Глубокая тень под конвертом */
+#card-wrap::before{
+content:"";
+position:absolute;
+inset:0;
+z-index:-1;
+border-radius:22px;
+box-shadow:
+ 0 20px 40px rgba(0,0,0,0.8),    
+ 0 60px 120px rgba(0,0,0,0.4);
 }
 
 /* ---- ЛЁГКАЯ ТРЯСКА КОНВЕРТА ---- */
 @keyframes envelopeShake {
- 0% { transform: translateX(0); }
- 20% { transform: translateX(-3px); }
- 40% { transform: translateX(3px); }
- 60% { transform: translateX(-2px); }
- 80% { transform: translateX(2px); }
- 100% { transform: translateX(0); }
+0% { transform: translateX(0); }
+20% { transform: translateX(-3px); }
+40% { transform: translateX(3px); }
+60% { transform: translateX(-2px); }
+80% { transform: translateX(2px); }
+100% { transform: translateX(0); }
 }
 
 .card.closed {
@@ -46,124 +57,124 @@ body{
 }
 
 .page .center{ 
- display:flex; 
- justify-content:center; 
- align-items:center; 
- min-height:60vh; 
- flex-direction:column; 
+display:flex; 
+justify-content:center; 
+align-items:center; 
+min-height:60vh; 
+flex-direction:column; 
 }
 
 .card{ 
- width:820px; 
- height:500px; 
- border-radius:18px; 
- overflow:hidden; 
- transition:transform .6s; 
- cursor:pointer; 
+width:820px; 
+height:460px; /* ИСПРАВЛЕНО: УНИФИЦИРОВАНО С #card-wrap */
+border-radius:18px; 
+overflow:hidden; 
+transition:transform .6s; 
+cursor:pointer; 
 }
 
 .card .card-front{ 
- /* Гладкий градиент */
- background: linear-gradient(120deg, var(--envelope-dark), #123822); 
- color:var(--envelope-gold); 
- padding:36px; 
- display:flex; 
- flex-direction:column; 
- justify-content:center; 
- align-items:center; 
- height:100%; 
- text-align:center;
+/* Гладкий градиент */
+background: linear-gradient(120deg, var(--envelope-dark), #123822); 
+color:var(--envelope-gold); 
+padding:36px; 
+display:flex; 
+flex-direction:column; 
+justify-content:center; 
+align-items:center; 
+height:100%; 
+text-align:center;
 }
 
 .card .card-front .logo{ 
- width:120px; 
- height:auto; 
- margin-bottom:10px; 
- filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); 
+width:120px; 
+height:auto; 
+margin-bottom:10px; 
+filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); 
 }
 
 .card .card-inner{ 
- background: linear-gradient(180deg, var(--inside-bg) 0%, #fefcf7 100%); 
- padding:36px; 
- height:100%; 
- display:flex; 
- align-items:center; 
- justify-content:center; 
+background: linear-gradient(180deg, var(--inside-bg) 0%, #fefcf7 100%); 
+padding:36px; 
+height:100%; 
+display:flex; 
+align-items:center; 
+justify-content:center; 
 }
 
 .certificate{ 
- text-align:center; 
- border:2px dashed rgba(0,0,0,0.06); 
- padding:24px; 
- width:86%; 
- border-radius:12px; 
- background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(250,246,240,0.9)); 
- box-shadow: 0 6px 20px rgba(10,10,10,0.06); 
- color: var(--inside-text);
+text-align:center; 
+border:2px dashed rgba(0,0,0,0.06); 
+padding:24px; 
+width:86%; 
+border-radius:12px; 
+background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(250,246,240,0.9)); 
+box-shadow: 0 6px 20px rgba(10,10,10,0.06); 
+color: var(--inside-text);
 }
 
 .certificate h2{ 
- font-size:28px; 
- margin:6px 0; 
- color:var(--inside-text);
+font-size:28px; 
+margin:6px 0; 
+color:var(--inside-text);
 }
 
 .certificate .big{ 
- font-size:22px; 
- font-weight:600; 
- margin:12px 0; 
- color:var(--inside-text);
+font-size:22px; 
+font-weight:600; 
+margin:12px 0; 
+color:var(--inside-text);
 }
 
 .certificate p{ 
- margin:6px 0; 
- color:var(--muted); 
+margin:6px 0; 
+color:var(--muted); 
 }
 
 button{ 
- background:var(--envelope-gold); 
- border:none; 
- padding:10px 14px; 
- border-radius:8px; 
- cursor:pointer; 
- color:#fff; 
- font-weight:600; 
- margin:4px;
- transition: transform .2s;
+background:var(--envelope-gold); 
+border:none; 
+padding:10px 14px; 
+border-radius:8px; 
+cursor:pointer; 
+color:#fff; 
+font-weight:600; 
+margin:4px;
+transition: transform .2s;
 }
 button:hover{ transform: scale(1.05); }
 
 input, textarea{ 
- padding:8px 10px; 
- border-radius:8px; 
- border:1px solid #ddd; 
- width:100%;
- box-sizing:border-box;
+padding:8px 10px; 
+border-radius:8px; 
+border:1px solid #ddd; 
+width:100%;
+box-sizing:border-box;
 }
 
 label{ 
- display:block; 
- margin:10px 0; 
+display:block; 
+margin:10px 0; 
 }
 
 small{ 
- font-size:12px; 
- color:var(--muted); 
+font-size:12px; 
+color:var(--muted); 
 }
 
 /* responsive */
 @media (max-width:900px){
-  .card{ width:100%; height:auto; border-radius:12px; }
-  .card .card-inner, .card .card-front{ padding:20px; }
-  .card .card-front .logo{ width:80px; margin-bottom:8px; }
-  .certificate{ width:95%; padding:16px; }
-  .certificate h2{ font-size:24px; }
-  .certificate .big{ font-size:20px; }
-  button{ padding:8px 12px; font-size:14px; }
+ .card{ width:100%; height:auto; border-radius:12px; }
+ .card .card-inner, .card .card-front{ padding:20px; }
+ .card .card-front .logo{ width:80px; margin-bottom:8px; }
+ .certificate{ width:95%; padding:16px; }
+ .certificate h2{ font-size:24px; }
+ .certificate .big{ font-size:20px; }
+ button{ padding:8px 12px; font-size:14px; }
 }
 
 @media (max-width:500px){
-  .certificate h2{ font-size:20px; }
-  .certificate .big{ font-size:18px; }
-  button{ width:100%; }
+ .certificate h2{ font-size:20px; }
+ .certificate .big{ font-size:18px; }
+ button{ width:100%; }
 }
