@@ -149,19 +149,25 @@ createForm.onsubmit = async (e) => {
 
 // ---------- Проверка сертификата ----------
 checkBtn.onclick = async () => {
-  const code = checkCodeInput.value.trim()
-  if (!/^\d{5}$/.test(code)){ alert("Введите корректный 5-значный код"); return }
+  const code = checkCodeInput.value.trim();
+  if (!/^\d{5}$/.test(code)) {
+    alert("Введите корректный 5-значный код");
+    return;
+  }
 
   const { data, error } = await supabase
     .from('certificates')
     .select('*')
     .eq('code', code)
-    .single()
+    .single();
 
-  if (error || !data){
-    checkResult.innerHTML = `<p style="color:red">❌ Сертификат не найден</p>`
-    return
+  if (error || !data) {
+    checkResult.innerHTML = `<p style="color:red">❌ Сертификат не найден</p>`;
+    return;
   }
+
+  // используем уже существующую ссылку (shareLink.value), которую создали при создании сертификата
+  const link = shareLink.value; // <-- это та ссылка, что была сгенерирована при создании
 
   checkResult.innerHTML = `
     <p style="color:green">✔ Сертификат найден</p>
@@ -169,8 +175,22 @@ checkBtn.onclick = async () => {
     <p><b>Программа:</b> ${data.program || '-'}</p>
     <p><b>Дата:</b> ${data.date || '-'}</p>
     <p><b>Создан:</b> ${new Date(data.created_at).toLocaleString()}</p>
-  `
-}
+    <button id="copyLinkCheck">Скопировать ссылку</button>
+  `;
+
+  const copyLinkCheckBtn = document.getElementById('copyLinkCheck');
+
+  copyLinkCheckBtn.onclick = () => {
+    const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${link}`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      copyLinkCheckBtn.textContent = 'Скопировано!';
+      setTimeout(() => copyLinkCheckBtn.textContent = 'Скопировать ссылку', 1500);
+    }).catch(err => {
+      alert('Не удалось скопировать: ' + err);
+    });
+  };
+};
+
 
 // ---------- Копирование ссылки ----------
 copyLinkBtn.onclick = () => {
