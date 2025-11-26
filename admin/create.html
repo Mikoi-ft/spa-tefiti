@@ -6,7 +6,6 @@
 <title>Admin — Создание и проверка сертификатов | Tefiti SPA</title>
 <link rel="stylesheet" href="/styles.css">
 </head>
-
 <body class="page">
 <main class="container">
   <h1>Админ — Создание и проверка сертификатов</h1>
@@ -35,7 +34,7 @@
     <label>Программа / Стоимость:
       <input id="program" placeholder="Например: SPA-релакс — 60$" />
     </label>
-    <label>Срок действия:
+    <label>Дата (дата использования):
       <input id="date" type="date" />
     </label>
     <button type="submit">Создать сертификат</button>
@@ -44,7 +43,9 @@
   <div id="result" style="display:none; margin-top:20px;">
     <p>Сертификат создан!</p>
     <p>Код: <b id="codeOut"></b></p>
-    <p>Ссылка: <input id="shareLink" readonly style="width:100%"/></p>
+    <p>Ссылка:
+      <input id="shareLink" readonly style="width:100%"/>
+    </p>
     <button id="copyLink">Скопировать ссылку</button>
     <a id="openLink" target="_blank" style="margin-left:10px;">Открыть сертификат</a>
   </div>
@@ -84,15 +85,15 @@ const shareLink = document.getElementById('shareLink')
 const copyLinkBtn = document.getElementById('copyLink')
 const openLinkA = document.getElementById('openLink')
 
+// Проверка сертификата
 const checkArea = document.getElementById('check-area')
 const checkBtn = document.getElementById('checkBtn')
 const checkCodeInput = document.getElementById('checkCode')
 const checkResult = document.getElementById('checkResult')
 
-// Локальный пароль администратора
+// ---------- Локальная авторизация ----------
 const ADMIN_PASSWORD = "tefiti000"
 
-// ---------- Авторизация ----------
 loginBtn.onclick = () => {
   const pw = passwordInput.value.trim()
   if (!pw) { loginMsg.textContent = 'Введите пароль'; return }
@@ -107,7 +108,6 @@ loginBtn.onclick = () => {
   }
 }
 
-// Выход
 signoutBtn.onclick = () => {
   passwordInput.value = ''
   loginMsg.textContent = ''
@@ -123,8 +123,7 @@ createForm.onsubmit = async (e) => {
   const full_name = fullNameInput.value.trim()
   const program = programInput.value.trim()
   const date = dateInput.value || null
-
-  if (!full_name){ alert('Введите ФИО'); return }
+  if (!full_name) { alert('Введите ФИО'); return }
 
   const { data, error } = await supabase.rpc('insert_certificate_with_password', {
     p_password: ADMIN_PASSWORD,
@@ -133,41 +132,38 @@ createForm.onsubmit = async (e) => {
     p_date: date
   })
 
-  if (error){ alert('Ошибка: ' + error.message); return }
+  if (error) { alert('Ошибка при сохранении: ' + error.message); return }
 
-  const id = data[0].cert_id;
-  const code = data[0].cert_code;
-
+  const id = data[0].cert_id
+  const code = data[0].cert_code
 
   codeOut.textContent = code
+
   const link = `${location.origin}/certificate/view.html?id=${id}`
   shareLink.value = link
   openLinkA.href = link
   openLinkA.textContent = 'Открыть сертификат'
+
   resultBox.style.display = 'block'
 }
 
-// ---------- Проверка сертификата ----------
+// ---------- Проверка сертификата по коду ----------
 checkBtn.onclick = async () => {
-  const code = checkCodeInput.value.trim();
-  if (!/^\d{5}$/.test(code)) {
-    alert("Введите корректный 5-значный код");
-    return;
-  }
+  const code = checkCodeInput.value.trim()
+  if (!/^\d{5}$/.test(code)){ alert("Введите корректный 5-значный код"); return }
 
   const { data, error } = await supabase
     .from('certificates')
     .select('*')
     .eq('code', code)
-    .single();
+    .single()
 
-  if (error || !data) {
-    checkResult.innerHTML = `<p style="color:red">❌ Сертификат не найден</p>`;
-    return;
+  if (error || !data){
+    checkResult.innerHTML = `<p style="color:red">❌ Сертификат не найден</p>`
+    return
   }
 
-  // используем уже существующую ссылку (shareLink.value), которую создали при создании сертификата
-  const link = shareLink.value; // <-- это та ссылка, что была сгенерирована при создании
+  const link = `${location.origin}/certificate/view.html?id=${data.id}`
 
   checkResult.innerHTML = `
     <p style="color:green">✔ Сертификат найден</p>
@@ -175,36 +171,22 @@ checkBtn.onclick = async () => {
     <p><b>Программа:</b> ${data.program || '-'}</p>
     <p><b>Дата:</b> ${data.date || '-'}</p>
     <p><b>Создан:</b> ${new Date(data.created_at).toLocaleString()}</p>
-    <button id="copyLinkCheck">Скопировать ссылку</button>
-  `;
+    <p>Ссылка на сертификат:
+      <input id="checkShareLink" value="${link}" readonly style="width:100%"/>
+      <button id="checkCopyLinkBtn">Скопировать ссылку</button>
+    </p>
+  `
 
-  const copyLinkCheckBtn = document.getElementById('copyLinkCheck');
-
-  copyLinkCheckBtn.onclick = () => {
-    const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${shareLink.value}`;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      copyLinkCheckBtn.textContent = 'Скопировано!';
-      setTimeout(() => copyLinkCheckBtn.textContent = 'Скопировать ссылку', 1500);
-    }).catch(err => {
-      alert('Не удалось скопировать: ' + err);
-    });
-  };
-};
-
-
-// ---------- Копирование ссылки ----------
-copyLinkBtn.onclick = () => {
-  const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${shareLink.value}`;
-  
-  // используем современный API для копирования
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    copyLinkBtn.textContent = 'Скопировано!';
-    setTimeout(() => copyLinkBtn.textContent = 'Скопировать ссылку', 1500);
-  }).catch(err => {
-    alert('Не удалось скопировать: ' + err);
-  });
+  // копирование ссылки
+  document.getElementById('checkCopyLinkBtn').onclick = () => {
+    const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${link}`
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => {
+        alert('Ссылка скопирована!')
+      })
+      .catch(err => alert('Не удалось скопировать: ' + err))
+  }
 }
 </script>
-
 </body>
 </html>
