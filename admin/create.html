@@ -174,10 +174,15 @@ checkBtn.onclick = async () => {
 
 // ---------- Копирование ссылки ----------
 copyLinkBtn.onclick = () => {
-  shareLink.select()
-  document.execCommand('copy')
-  copyLinkBtn.textContent = 'Скопировано!'
-  setTimeout(()=> copyLinkBtn.textContent = 'Скопировать ссылку', 1500)
+  const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${shareLink.value}`;
+  
+  // используем современный API для копирования
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    copyLinkBtn.textContent = 'Скопировано!';
+    setTimeout(() => copyLinkBtn.textContent = 'Скопировать ссылку', 1500);
+  }).catch(err => {
+    alert('Не удалось скопировать: ' + err);
+  });
 }
 </script>
 
