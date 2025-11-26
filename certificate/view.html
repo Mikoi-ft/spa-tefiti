@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Подарочный сертификат | Tefiti SPA</title>
 <link rel="stylesheet" href="/styles.css">
-</head>
+
+<!-- Локальный шрифт только для этой страницы -->
 <style>
 @font-face {
   font-family: 'Becker';
@@ -13,10 +14,24 @@
   font-display: swap;
 }
 
+/* Применяем шрифт и увеличиваем размер текста */
 .page {
   font-family: 'Becker', sans-serif;
+  font-size: 20px;
+}
+
+/* Логотип увеличен в 2 раза */
+.card .card-front .logo {
+  width: 240px !important;
+  height: auto;
+}
+
+/* Конверт теперь ровный */
+.card.closed { 
+  transform: none !important;
 }
 </style>
+</head>
 
 <body class="page">
   <canvas id="confetti-canvas" style="position:fixed;left:0;top:0;pointer-events:none;z-index:9999;"></canvas>
@@ -36,9 +51,10 @@
           <p id="program">—</p>
           <p id="date">—</p>
           <p>Уникальный номер: <b id="code">—</b></p>
+
           <div style="margin-top:12px">
             <button id="downloadPdf">Скачать PDF</button>
-            <button id="copyLinkBtn">Скопировать ссылку</button>
+            <!-- Кнопка копирования удалена -->
           </div>
         </div>
       </div>
@@ -64,7 +80,6 @@ const programEl = document.getElementById('program')
 const dateEl = document.getElementById('date')
 const codeEl = document.getElementById('code')
 const downloadPdfBtn = document.getElementById('downloadPdf')
-const copyLinkBtn = document.getElementById('copyLinkBtn')
 
 if(!id){
   loading.textContent = 'Некорректная ссылка (нет id)'
@@ -111,10 +126,6 @@ if(!id){
       pdf.addImage(img, 'PNG', 0, 0, pdfWidth, pdfHeight)
       pdf.save(`Tefiti-certificate-${codeEl.textContent}.pdf`)
     }
-
-    copyLinkBtn.onclick = () => {
-      navigator.clipboard.writeText(location.href)
-    }
   })()
 }
 
@@ -128,7 +139,7 @@ function loadScript(src){
   })
 }
 
-/* celebration */
+/* Конфетти */
 async function startCelebration(){
   await loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js')
   const canvas = document.getElementById('confetti-canvas')
