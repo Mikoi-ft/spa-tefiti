@@ -23,18 +23,6 @@ body{
  display: inline-block;
 }
 
-/* Глубокая тень под конвертом - СДЕЛАНО ТЕМНЕЕ И ВЫРАЗИТЕЛЬНЕЕ */
-#card-wrap::before{
- content:"";
- position:absolute;
- inset:0;
- z-index:-1;
- border-radius:22px; 
- box-shadow:
-  0 20px 40px rgba(0,0,0,0.8), /* Очень темная, резкая тень */
-  0 60px 120px rgba(0,0,0,0.4); /* Мягкое рассеивание внизу */
-}
-
 /* ---- ЛЁГКАЯ ТРЯСКА КОНВЕРТА ---- */
 @keyframes envelopeShake {
  0% { transform: translateX(0); }
