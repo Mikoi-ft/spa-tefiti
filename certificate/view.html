@@ -58,17 +58,26 @@ if(!id){
   loading.textContent = 'Некорректная ссылка (нет id)'
 } else {
   (async ()=>{
-    const { data, error } = await supabase.from('certificates').select('*').eq('id', id).single()
-    if(error || !data){ loading.textContent = 'Сертификат не найден'; console.error(error); return }
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if(error || !data){
+      loading.textContent = 'Сертификат не найден'
+      return
+    }
+
     loading.style.display = 'none'
-    front.querySelector('h2').textContent = 'Подарочный сертификат'
+
     fullNameEl.textContent = data.full_name
     programEl.textContent = data.program || ''
     dateEl.textContent = data.date ? new Date(data.date).toLocaleDateString() : ''
     codeEl.textContent = data.code
 
-    // обработка "открыть" карточки
     front.addEventListener('click', openCard)
+
     function openCard(){
       cardWrap.classList.remove('closed')
       inner.style.display = 'block'
@@ -76,21 +85,23 @@ if(!id){
       startCelebration()
     }
 
-    // скачать PDF — используем html2canvas + jsPDF
     downloadPdfBtn.onclick = async () => {
       const el = document.querySelector('.certificate')
-      // загрузим библиотеки динамически
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
       const canvas = await html2canvas(el, {scale:2})
       const img = canvas.toDataURL('image/png')
       const { jsPDF } = window.jspdf
-      const pdf = new jsPDF({ orientation: 'landscape' }) // открытка горизонтальная
+      const pdf = new jsPDF({ orientation: 'landscape' })
       const imgProps = pdf.getImageProperties(img)
       const pdfWidth = pdf.internal.pageSize.getWidth()
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
       pdf.addImage(img, 'PNG', 0, 0, pdfWidth, pdfHeight)
       pdf.save(`Tefiti-certificate-${codeEl.textContent}.pdf`)
+    }
+
+    copyLinkBtn.onclick = () => {
+      navigator.clipboard.writeText(location.href)
     }
   })()
 }
@@ -105,25 +116,23 @@ function loadScript(src){
   })
 }
 
-/* ----- Confetti / celebration ----- */
-// будем использовать canvas-confetti
+/* celebration */
 async function startCelebration(){
   await loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js')
   const canvas = document.getElementById('confetti-canvas')
-  // resize canvas to viewport
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
   const myConfetti = confetti.create(canvas, { resize: true, useWorker: true })
-  // первая волна
+
   myConfetti({
     particleCount: 160,
     spread: 140,
     origin: { y: 0.6 }
   })
-  // несколько мелких вспышек
+
   setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.2, y:0.2 }}), 300)
   setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.8, y:0.2 }}), 500)
-  // блёстки: частые маленькие частицы
+
   let bursts = 0
   const glitter = setInterval(()=>{
     myConfetti({

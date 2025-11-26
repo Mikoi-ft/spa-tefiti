@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Admin — Создать сертификат | Tefiti SPA</title>
+<title>Admin — Создание сертификата | Tefiti SPA</title>
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="page">
@@ -74,8 +74,8 @@ const shareLink = document.getElementById('shareLink')
 const copyLinkBtn = document.getElementById('copyLink')
 const openLinkA = document.getElementById('openLink')
 
-// ---------- ЛОКАЛЬНАЯ АВТОРИЗАЦИЯ (без bcrypt, без Supabase) ----------
-const ADMIN_PASSWORD = "tefiti000"    // ← твой пароль
+// ---------- ЛОКАЛЬНАЯ АВТОРИЗАЦИЯ ----------
+const ADMIN_PASSWORD = "tefiti000"
 
 loginBtn.onclick = () => {
   const pw = passwordInput.value.trim()
@@ -104,34 +104,7 @@ signoutBtn.onclick = () => {
   loginArea.style.display = 'block'
 }
 
-// ---------- Генерация уникального кода ----------
-function randomCode(len = 5) {
-  let s = ''
-  const chars = '0123456789'
-  for (let i = 0; i < len; i++) {
-    s += chars[Math.floor(Math.random() * chars.length)]
-  }
-  return s
-}
-
-async function uniqueCode() {
-  for (let i = 0; i < 10; i++) {
-    const c = randomCode(5)
-    const { data } = await supabase
-      .from('certificates')
-      .select('id')
-      .eq('code', c)
-      .limit(1)
-
-    if (!data || data.length === 0) return c
-  }
-
-  // если вдруг 10 попыток столкнулись с коллизией → выдадим длиннее (редко бывает)
-  return randomCode(6)
-}
-
-
-// ---------- Создание сертификата ----------
+// ---------- Создание сертификата через RPC ----------
 createForm.onsubmit = async (e) => {
   e.preventDefault()
 
@@ -144,23 +117,24 @@ createForm.onsubmit = async (e) => {
     return
   }
 
-  const code = await uniqueCode()
-
-  const { data, error } = await supabase.from('certificates').insert([{
-    code,
-    full_name,
-    program,
-    date
-  }]).select().single()
+  const { data, error } = await supabase.rpc('insert_certificate_with_password', {
+    p_password: ADMIN_PASSWORD,
+    p_full_name: full_name,
+    p_program: program,
+    p_date: date
+  })
 
   if (error) {
     alert('Ошибка при сохранении: ' + error.message)
     return
   }
 
-  codeOut.textContent = data.code
+  const id = data[0].id
+  const code = data[0].code
 
-  const link = `${location.origin}/certificate/view.html?id=${data.id}`
+  codeOut.textContent = code
+
+  const link = `${location.origin}/certificate/view.html?id=${id}`
   shareLink.value = link
   openLinkA.href = link
   openLinkA.textContent = 'Открыть сертификат'
