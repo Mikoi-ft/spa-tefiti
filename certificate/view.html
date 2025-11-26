@@ -6,7 +6,6 @@
 <title>Подарочный сертификат | Tefiti SPA</title>
 <link rel="stylesheet" href="/styles.css">
 
-<!-- Локальный шрифт только для этой страницы -->
 <style>
 @font-face {
   font-family: 'Becker';
@@ -50,7 +49,7 @@ body {
   z-index: 1;
 }
 
-/* Мягкая тень с рассеиванием */
+/* Мягкая тень с рассеиванием - СДЕЛАНО ТЕМНЕЕ */
 #card-wrap::before {
   content: "";
   position: absolute;
@@ -58,9 +57,9 @@ body {
   z-index: -1;
   border-radius: 22px;
   box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.35),
-    0 40px 80px rgba(0, 0, 0, 0.25),
-    0 60px 120px rgba(0, 0, 0, 0.12);
+	0 25px 50px rgba(0, 0, 0, 0.6), /* Более темная тень */
+	0 50px 100px rgba(0, 0, 0, 0.4),
+	0 75px 150px rgba(0, 0, 0, 0.2);
 }
 
 /* Конверт закрыт */
@@ -77,7 +76,7 @@ body {
   transform-origin: top;
 }
 
-/* Фронт конверта */
+/* Фронт конверта - СДЕЛАНО ГЛАДКИМ (убран background-image) */
 .card .card-front {
   background: #0b2a1e;
   color: #caa94b;
@@ -88,8 +87,8 @@ body {
   align-items: center;
   height: 100%;
   text-align: center;
-  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
-  background-size: 3px 3px;
+  /* background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); УДАЛЕНО */
+  /* background-size: 3px 3px; УДАЛЕНО */
 }
 
 /* Логотип увеличен */
@@ -156,35 +155,35 @@ button:hover {
 
 /* Анимация открытия конверта */
 @keyframes openEnvelope {
-  0% { transform: rotateX(0deg); }
-  60% { transform: rotateX(-70deg); }
-  100% { transform: rotateX(-82deg); }
+  0% { transform: rotateX(0deg); }
+  60% { transform: rotateX(-70deg); }
+  100% { transform: rotateX(-82deg); }
 }
 
 /* Лёгкая тряска конверта */
 @keyframes envelopeShake {
-  0%, 25%, 100% { transform: translateX(0) rotate(0deg); }
-  5% { transform: translateX(-2px) rotate(-0.7deg); }
-  10% { transform: translateX(2px) rotate(0.7deg); }
-  15% { transform: translateX(-1px) rotate(-0.4deg); }
-  20% { transform: translateX(1px) rotate(0.4deg); }
+  0%, 25%, 100% { transform: translateX(0) rotate(0deg); }
+  5% { transform: translateX(-2px) rotate(-0.7deg); }
+  10% { transform: translateX(2px) rotate(0.7deg); }
+  15% { transform: translateX(-1px) rotate(-0.4deg); }
+  20% { transform: translateX(1px) rotate(0.4deg); }
 }
 
 /* Адаптив */
 @media (max-width:900px){
-  #card-wrap{ width:100%; height:auto; border-radius:12px; }
-  .card .card-inner, .card .card-front{ padding:20px; }
-  .card .card-front .logo{ width:160px; margin-bottom:8px; }
-  .certificate{ width:95%; padding:16px; }
-  .certificate h2{ font-size:24px; }
-  .certificate .big{ font-size:20px; }
-  button{ padding:8px 12px; font-size:14px; }
+  #card-wrap{ width:100%; height:auto; border-radius:12px; }
+  .card .card-inner, .card .card-front{ padding:20px; }
+  .card .card-front .logo{ width:160px; margin-bottom:8px; }
+  .certificate{ width:95%; padding:16px; }
+  .certificate h2{ font-size:24px; }
+  .certificate .big{ font-size:20px; }
+  button{ padding:8px 12px; font-size:14px; }
 }
 
 @media (max-width:500px){
-  .certificate h2{ font-size:20px; }
-  .certificate .big{ font-size:18px; }
-  button{ width:100%; }
+  .certificate h2{ font-size:20px; }
+  .certificate .big{ font-size:18px; }
+  button{ width:100%; }
 }
 </style>
 </head>
@@ -193,28 +192,29 @@ button:hover {
 <canvas id="confetti-canvas" style="position:fixed;left:0;top:0;pointer-events:none;z-index:9999;"></canvas>
 
 <main class="container center">
-  <div id="card-wrap" class="card closed">
-    <div class="card-front">
-      <img src="/logo.svg" alt="Tefiti SPA" class="logo"/>
-      <h2 style="margin:0;">Подарочный сертификат</h2>
-      <p class="small" style="margin:0;">Кликни, чтобы открыть</p>
-    </div>
+  <div id="card-wrap" class="card closed">
+    <div class="card-front">
+      <img src="/logo.svg" alt="Tefiti SPA" class="logo"/>
+      <h2 style="margin:0;">Подарочный сертификат</h2>
+      <p class="small" style="margin:0;">Кликни, чтобы открыть</p>
+    </div>
 
-    <div class="card-inner" style="display:none;">
-      <div class="certificate">
-        <h2 id="title">Tefiti</h2>
-        <p class="big" id="full_name">—</p>
-        <p id="program">—</p>
-        <p id="date">—</p>
-        <p>Уникальный номер: <b id="code">—</b></p>
-        <div style="margin-top:12px">
-          <button id="downloadPdf">Скачать PDF</button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div class="card-inner" style="display:none;">
+      <div class="certificate">
+        <h2 id="title">Tefiti</h2>
+        <p class="big" id="full_name">—</p>
+        <p id="program">—</p>
+        <p id="date">—</p>
+        <p>Уникальный номер: <b id="code">—</b></p>
+        <div style="margin-top:12px">
+          <button id="downloadPdf">Скачать PDF</button>
+        </div>
+      </div>
+      <img src="uploaded:image_2d8b79.png-bf0c558a-1509-4079-b9b4-53d6eb680d4a" alt="Изображение интерьера спа-салона (визуальный контент из внутреннего содержимого)">
+    </div>
+  </div>
 
-  <p id="loading">Загрузка сертификата...</p>
+  <p id="loading">Загрузка сертификата...</p>
 </main>
 
 <script type="module">
@@ -236,89 +236,89 @@ const codeEl = document.getElementById('code')
 const downloadPdfBtn = document.getElementById('downloadPdf')
 
 if(!id){
-  loading.textContent = 'Некорректная ссылка (нет id)'
+  loading.textContent = 'Некорректная ссылка (нет id)'
 } else {
-  (async ()=>{
-    const { data, error } = await supabase
-      .from('certificates')
-      .select('*')
-      .eq('id', id)
-      .single()
+  (async ()=>{
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('id', id)
+      .single()
 
-    if(error || !data){
-      loading.textContent = 'Сертификат не найден'
-      return
-    }
+    if(error || !data){
+      loading.textContent = 'Сертификат не найден'
+      return
+    }
 
-    loading.style.display = 'none'
+    loading.style.display = 'none'
 
-    fullNameEl.textContent = data.full_name
-    programEl.textContent = data.program || ''
-    dateEl.textContent = data.date ? new Date(data.date).toLocaleDateString() : ''
-    codeEl.textContent = data.code
+    fullNameEl.textContent = data.full_name
+    programEl.textContent = data.program || ''
+    dateEl.textContent = data.date ? new Date(data.date).toLocaleDateString() : ''
+    codeEl.textContent = data.code
 
-    front.addEventListener('click', openCard)
+    front.addEventListener('click', openCard)
 
-    function openCard(){
-      cardWrap.classList.remove('closed')
-      cardWrap.classList.add('opened')
-      cardWrap.style.animation = 'none';
-      inner.style.display = 'block'
-      front.style.display = 'none'
-      startCelebration()
-    }
+    function openCard(){
+      cardWrap.classList.remove('closed')
+      cardWrap.classList.add('opened')
+      cardWrap.style.animation = 'none';
+      inner.style.display = 'block'
+      front.style.display = 'none'
+      startCelebration()
+    }
 
-    downloadPdfBtn.onclick = async () => {
-      const el = document.querySelector('.certificate')
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
-      const canvas = await html2canvas(el, {scale:2})
-      const img = canvas.toDataURL('image/png')
-      const { jsPDF } = window.jspdf
-      const pdf = new jsPDF({ orientation: 'landscape' })
-      const imgProps = pdf.getImageProperties(img)
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
-      pdf.addImage(img, 'PNG', 0, 0, pdfWidth, pdfHeight)
-      pdf.save(`Tefiti-certificate-${codeEl.textContent}.pdf`)
-    }
-  })()
+    downloadPdfBtn.onclick = async () => {
+      const el = document.querySelector('.certificate')
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+      const canvas = await html2canvas(el, {scale:2})
+      const img = canvas.toDataURL('image/png')
+      const { jsPDF } = window.jspdf
+      const pdf = new jsPDF({ orientation: 'landscape' })
+      const imgProps = pdf.getImageProperties(img)
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+      pdf.addImage(img, 'PNG', 0, 0, pdfWidth, pdfHeight)
+      pdf.save(`Tefiti-certificate-${codeEl.textContent}.pdf`)
+    }
+  })()
 }
 
 function loadScript(src){
-  return new Promise((res,rej)=>{
-    const s = document.createElement('script')
-    s.src = src
-    s.onload = res
-    s.onerror = rej
-    document.head.appendChild(s)
-  })
+  return new Promise((res,rej)=>{
+    const s = document.createElement('script')
+    s.src = src
+    s.onload = res
+    s.onerror = rej
+    document.head.appendChild(s)
+  })
 }
 
 /* Конфетти */
 async function startCelebration(){
-  await loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js')
-  const canvas = document.getElementById('confetti-canvas')
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
-  const myConfetti = confetti.create(canvas, { resize: true, useWorker: true })
+  await loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js')
+  const canvas = document.getElementById('confetti-canvas')
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+  const myConfetti = confetti.create(canvas, { resize: true, useWorker: true })
 
-  myConfetti({ particleCount: 160, spread: 140, origin: { y: 0.6 }})
-  setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.2, y:0.2 }}), 300)
-  setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.8, y:0.2 }}), 500)
+  myConfetti({ particleCount: 160, spread: 140, origin: { y: 0.6 }})
+  setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.2, y:0.2 }}), 300)
+  setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.8, y:0.2 }}), 500)
 
-  let bursts = 0
-  const glitter = setInterval(()=>{
-    myConfetti({
-      particleCount: 10 + Math.floor(Math.random()*10),
-      spread: 60,
-      startVelocity: 30,
-      ticks: 100,
-      origin: { x: Math.random(), y: Math.random() * 0.5 }
-    })
-    bursts++
-    if(bursts>10) clearInterval(glitter)
-  }, 200)
+  let bursts = 0
+  const glitter = setInterval(()=>{
+    myConfetti({
+      particleCount: 10 + Math.floor(Math.random()*10),
+      spread: 60,
+      startVelocity: 30,
+      ticks: 100,
+      origin: { x: Math.random(), y: Math.random() * 0.5 }
+    })
+    bursts++
+    if(bursts>10) clearInterval(glitter)
+  }, 200)
 }
 </script>
 </body>
