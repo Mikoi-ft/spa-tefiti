@@ -29,7 +29,7 @@
 
   <!-- Блок проверки сертификата -->
   <div id="checker" style="display:none">
-    <input id="codeInput" placeholder="Введите уникальный код (например ABC123...)" style="width:60%"/>
+    <input id="codeInput" placeholder="Введите код (5 цифр)" style="width:60%" maxlength="5"/>
     <button id="checkBtn">Проверить</button>
     <div id="checkResult"></div>
   </div>
@@ -38,10 +38,10 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
-import * as bcrypt from 'https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+// ЭЛЕМЕНТЫ
 const loginBtn = document.getElementById('loginBtn')
 const passwordInput = document.getElementById('adminPassword')
 const loginMsg = document.getElementById('loginMsg')
@@ -50,17 +50,19 @@ const loginArea = document.getElementById('login-area')
 const signoutBtn = document.getElementById('signout')
 const checker = document.getElementById('checker')
 
-// Вход по паролю
-loginBtn.onclick = async () => {
+// ❗ Пароль администратора (хранится в коде)
+const ADMIN_PASSWORD = "tefiti000"
+
+// ---------- Авторизация ----------
+loginBtn.onclick = () => {
   const pw = passwordInput.value.trim()
-  if(!pw){ loginMsg.textContent = 'Введите пароль'; return }
 
-  // Получаем хэш пароля из таблицы admins
-  const { data, error } = await supabase.from('admins').select('password_hash').limit(1).single()
-  if(error || !data){ loginMsg.textContent = 'Ошибка проверки пароля'; return }
+  if (!pw) {
+    loginMsg.textContent = 'Введите пароль'
+    return
+  }
 
-  const isValid = bcrypt.compareSync(pw, data.password_hash)
-  if(isValid){
+  if (pw === ADMIN_PASSWORD) {
     loginArea.style.display = 'none'
     userInfo.style.display = 'block'
     checker.style.display = 'block'
@@ -70,7 +72,7 @@ loginBtn.onclick = async () => {
   }
 }
 
-// Выход
+// ---------- Выход ----------
 signoutBtn.onclick = () => {
   passwordInput.value = ''
   loginMsg.textContent = ''
@@ -79,24 +81,35 @@ signoutBtn.onclick = () => {
   loginArea.style.display = 'block'
 }
 
-// Проверка сертификата
+// ---------- Проверка сертификата ----------
 document.getElementById('checkBtn').onclick = async () => {
   const code = document.getElementById('codeInput').value.trim()
-  if(!code){ alert('Введите код'); return }
-
-  const { data, error } = await supabase.from('certificates').select('*').eq('code', code).limit(1).single()
   const resDiv = document.getElementById('checkResult')
-  if(error || !data){
-    resDiv.innerHTML = '<p style="color:red">Сертификат не найден или код неверный</p>'
+
+  // Проверка формата: ровно 5 цифр
+  if (!/^\d{5}$/.test(code)) {
+    resDiv.innerHTML = '<p style="color:red">Код должен состоять из 5 цифр</p>'
+    return
+  }
+
+  const { data, error } = await supabase
+    .from('certificates')
+    .select('*')
+    .eq('code', code)
+    .limit(1)
+    .single()
+
+  if (error || !data) {
+    resDiv.innerHTML = '<p style="color:red">Сертификат не найден</p>'
     return
   }
 
   resDiv.innerHTML = `
     <p style="color:green">Действительный сертификат</p>
-    <p>ФИО: ${data.full_name}</p>
-    <p>Программа: ${data.program || '-'}</p>
-    <p>Дата: ${data.date ? new Date(data.date).toLocaleDateString() : '-'}</p>
-    <p>Создан: ${new Date(data.created_at).toLocaleString()}</p>
+    <p><b>ФИО:</b> ${data.full_name}</p>
+    <p><b>Программа:</b> ${data.program || '-'}</p>
+    <p><b>Дата:</b> ${data.date ? new Date(data.date).toLocaleDateString() : '-'}</p>
+    <p><b>Создан:</b> ${new Date(data.created_at).toLocaleString()}</p>
   `
 }
 </script>
