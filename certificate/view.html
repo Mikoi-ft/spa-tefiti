@@ -14,52 +14,208 @@
   font-display: swap;
 }
 
-/* Применяем шрифт и увеличиваем размер текста */
-.page {
+/* Базовые стили страницы */
+body {
+  background: #1a3a2c;
+  margin: 0;
+  color: #caa94b;
   font-family: 'Becker', sans-serif;
   font-size: 20px;
 }
 
-/* Логотип увеличен в 2 раза */
+.container {
+  max-width: 920px;
+  margin: 40px auto;
+  padding: 20px;
+  position: relative; /* чтобы тень была внутри контейнера */
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  flex-direction: column;
+}
+
+/* Карточка / конверт */
+#card-wrap {
+  position: relative;
+  width: 820px;
+  height: 460px;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  perspective: 1000px;
+  z-index: 1;
+}
+
+/* Мягкая тень с рассеиванием */
+#card-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 22px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.35),
+    0 40px 80px rgba(0, 0, 0, 0.25),
+    0 60px 120px rgba(0, 0, 0, 0.12);
+}
+
+/* Конверт закрыт */
+.card.closed {
+  animation: envelopeShake 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+  transform-origin: top;
+}
+
+/* Конверт открыт */
+.card.opened {
+  animation: openEnvelope 0.8s ease forwards;
+  transform-style: preserve-3d;
+  transform-origin: top;
+}
+
+/* Фронт конверта */
+.card .card-front {
+  background: #0b2a1e;
+  color: #caa94b;
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+/* Логотип увеличен */
 .card .card-front .logo {
   width: 240px !important;
   height: auto;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
 }
 
-/* Конверт теперь ровный */
+/* Внутренняя сторона */
+.card .card-inner {
+  background: linear-gradient(180deg, #f6f2ec 0%, #fefcf7 100%);
+  padding: 36px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+/* Сертификат */
+.certificate {
+  text-align: center;
+  border: 2px dashed rgba(0,0,0,0.06);
+  padding: 24px;
+  width: 86%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(250,246,240,0.9));
+  box-shadow: 0 6px 20px rgba(10,10,10,0.06);
+  color: #5a4a2f;
+}
+
+.certificate h2 {
+  font-size: 28px;
+  margin: 6px 0;
+}
+
+.certificate .big {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+.certificate p {
+  margin: 6px 0;
+  color: #666;
+}
+
+button {
+  background: #caa94b;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  margin: 4px;
+  transition: transform .2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* Анимация открытия конверта */
+@keyframes openEnvelope {
+  0% { transform: rotateX(0deg); }
+  60% { transform: rotateX(-70deg); }
+  100% { transform: rotateX(-82deg); }
+}
+
+/* Лёгкая тряска конверта */
+@keyframes envelopeShake {
+  0%, 25%, 100% { transform: translateX(0) rotate(0deg); }
+  5% { transform: translateX(-2px) rotate(-0.7deg); }
+  10% { transform: translateX(2px) rotate(0.7deg); }
+  15% { transform: translateX(-1px) rotate(-0.4deg); }
+  20% { transform: translateX(1px) rotate(0.4deg); }
+}
+
+/* Адаптив */
+@media (max-width:900px){
+  #card-wrap{ width:100%; height:auto; border-radius:12px; }
+  .card .card-inner, .card .card-front{ padding:20px; }
+  .card .card-front .logo{ width:160px; margin-bottom:8px; }
+  .certificate{ width:95%; padding:16px; }
+  .certificate h2{ font-size:24px; }
+  .certificate .big{ font-size:20px; }
+  button{ padding:8px 12px; font-size:14px; }
+}
+
+@media (max-width:500px){
+  .certificate h2{ font-size:20px; }
+  .certificate .big{ font-size:18px; }
+  button{ width:100%; }
+}
 </style>
 </head>
 
 <body class="page">
-  <canvas id="confetti-canvas" style="position:fixed;left:0;top:0;pointer-events:none;z-index:9999;"></canvas>
+<canvas id="confetti-canvas" style="position:fixed;left:0;top:0;pointer-events:none;z-index:9999;"></canvas>
 
-  <main class="container center">
-    <div id="card-wrap" class="card closed">
-      <div class="card-front">
-        <img src="/logo.svg" alt="Tefiti SPA" class="logo"/>
-        <h2 style="margin: 0px;">Подарочный сертификат</h2>
-        <p class="small" style="margin: 0px;">Кликни, чтобы открыть</p>
-      </div>
+<main class="container center">
+  <div id="card-wrap" class="card closed">
+    <div class="card-front">
+      <img src="/logo.svg" alt="Tefiti SPA" class="logo"/>
+      <h2 style="margin:0;">Подарочный сертификат</h2>
+      <p class="small" style="margin:0;">Кликни, чтобы открыть</p>
+    </div>
 
-      <div class="card-inner" style="display:none;">
-        <div class="certificate">
-          <h2 id="title">Tefiti</h2>
-          <p class="big" id="full_name">—</p>
-          <p id="program">—</p>
-          <p id="date">—</p>
-          <p>Уникальный номер: <b id="code">—</b></p>
-
-          <div style="margin-top:12px">
-            <button id="downloadPdf">Скачать PDF</button>
-            <!-- Кнопка копирования удалена -->
-          </div>
+    <div class="card-inner" style="display:none;">
+      <div class="certificate">
+        <h2 id="title">Tefiti</h2>
+        <p class="big" id="full_name">—</p>
+        <p id="program">—</p>
+        <p id="date">—</p>
+        <p>Уникальный номер: <b id="code">—</b></p>
+        <div style="margin-top:12px">
+          <button id="downloadPdf">Скачать PDF</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <p id="loading">Загрузка сертификата...</p>
-  </main>
+  <p id="loading">Загрузка сертификата...</p>
+</main>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -104,13 +260,13 @@ if(!id){
     front.addEventListener('click', openCard)
 
     function openCard(){
-  cardWrap.classList.remove('closed')
-  cardWrap.style.animation = 'none';   // ← остановить тряску
-  inner.style.display = 'block'
-  front.style.display = 'none'
-  startCelebration()
-}
-
+      cardWrap.classList.remove('closed')
+      cardWrap.classList.add('opened')
+      cardWrap.style.animation = 'none';
+      inner.style.display = 'block'
+      front.style.display = 'none'
+      startCelebration()
+    }
 
     downloadPdfBtn.onclick = async () => {
       const el = document.querySelector('.certificate')
@@ -147,12 +303,7 @@ async function startCelebration(){
   canvas.height = window.innerHeight
   const myConfetti = confetti.create(canvas, { resize: true, useWorker: true })
 
-  myConfetti({
-    particleCount: 160,
-    spread: 140,
-    origin: { y: 0.6 }
-  })
-
+  myConfetti({ particleCount: 160, spread: 140, origin: { y: 0.6 }})
   setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.2, y:0.2 }}), 300)
   setTimeout(()=>myConfetti({ particleCount: 80, spread: 120, scalar: 0.9, origin: { x: 0.8, y:0.2 }}), 500)
 
