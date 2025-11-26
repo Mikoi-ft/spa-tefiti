@@ -181,7 +181,7 @@ checkBtn.onclick = async () => {
   const copyLinkCheckBtn = document.getElementById('copyLinkCheck');
 
   copyLinkCheckBtn.onclick = () => {
-    const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${link}`;
+    const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${shareLink.value}`;
     navigator.clipboard.writeText(textToCopy).then(() => {
       copyLinkCheckBtn.textContent = 'Скопировано!';
       setTimeout(() => copyLinkCheckBtn.textContent = 'Скопировать ссылку', 1500);
