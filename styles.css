@@ -270,10 +270,50 @@ button:hover {
    MOBILE
 ----------------------------------------------------- */
 /* ---------- MOBILE FIXES ---------- */
-@media (max-width: 650px) {
+/* ============================================================
+   АДАПТИВ — ВАРИАНТ B (воздушный, красивый, без поломок)
+   ============================================================ */
+
+/* --- Планшеты и большие телефоны --- */
+@media (max-width: 900px) {
+
+  .card {
+    width: 100%;
+    height: auto;
+  }
 
   .certificate {
-    padding: 30px 24px;
+    padding: 40px 32px;
+  }
+
+  .cert-title {
+    font-size: 32px;
+  }
+
+  .cert-row .label {
+    font-size: 18px;
+  }
+
+  .cert-row .value {
+    font-size: 26px;
+  }
+
+  .cert-btn {
+    width: 100%;
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  .card-front .logo {
+    width: 160px;
+  }
+}
+
+/* --- Обычные телефоны --- */
+@media (max-width: 600px) {
+
+  .certificate {
+    padding: 30px 22px;
   }
 
   .cert-title {
@@ -282,27 +322,34 @@ button:hover {
 
   .cert-row {
     margin-bottom: 18px;
-    padding-bottom: 4px;
+    padding-bottom: 5px;
   }
 
   .cert-row .label {
-    font-size: 16px;       /* подготовленный текст */
+    font-size: 16px;
   }
 
   .cert-row .value {
-    font-size: 22px;       /* данные из БД */
+    font-size: 22px;
   }
 
   .cert-btn {
-    width: 100%;
-    font-size: 18px;
-    padding: 14px;
-    margin-top: 30px;
+    font-size: 17px;
+    padding: 12px;
+  }
+
+  .card-front .logo {
+    width: 140px;
   }
 }
 
-/* EXTRA SMALL PHONES  */
+/* --- Маленькие телефоны (iPhone SE) --- */
 @media (max-width: 420px) {
+
+  .certificate {
+    padding: 24px 16px;
+  }
+
   .cert-title {
     font-size: 22px;
   }
@@ -314,11 +361,15 @@ button:hover {
   .cert-row .value {
     font-size: 20px;
   }
+
+  .cert-btn {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .card-front .logo {
+    width: 120px;
+  }
 }
 
 
-@media (max-width: 500px) {
-  .certificate h2 { font-size: 20px; }
-  .certificate .big { font-size: 18px; }
-  button { width: 100%; }
-}
