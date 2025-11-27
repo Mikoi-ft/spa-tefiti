@@ -116,15 +116,21 @@ body {
    СЕРТИФИКАТ ВНУТРИ
 ----------------------------------------------------- */
 .certificate {
-  text-align: center;
-  border: 2px dashed rgba(0,0,0,0.06);
-  padding: 24px;
-  width: 86%;
-  border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(250,246,240,0.95));
-  box-shadow: 0 6px 20px rgba(10,10,10,0.06);
+  background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%);
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  border-radius: 0; /* лист бумаги без скруглений */
+  border: none;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   color: var(--inside-text);
+  text-align: center;
 }
+
 
 .certificate h2 {
   font-size: 28px;
