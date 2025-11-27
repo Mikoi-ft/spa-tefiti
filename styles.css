@@ -16,23 +16,28 @@ color:var(--envelope-gold);
 }
 
 /* ---- КОНТЕЙНЕР С ОТДЕЛЁННОЙ ТЕНЬЮ ---- */
-#card-wrap{
-position: relative;
-padding: 0; /* ИСПРАВЛЕНО */
-display: inline-block;
+#card-wrap {
+  position: relative;
+  width: 820px;
+  height: 460px;
+  border-radius: 22px; /* СДЕЛАЛ БОЛЕЕ ГЛАДКИМ */
+  overflow: hidden;
+  cursor: pointer;
+  perspective: 1000px;
+  z-index: 1;
 }
 
-/* Глубокая тень под конвертом */
-#card-wrap::before{
-content:"";
-position:absolute;
-inset:0;
-z-index:-1;
-border-radius:22px;
-box-shadow:
- 0 20px 40px rgba(0,0,0,0.8),    
- 0 60px 120px rgba(0,0,0,0.4);
+#card-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 22px; /* ВЕРНУЛ ДЛЯ КРАСИВОГО ВЕРХНЕГО РАДИУСА */
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.8),
+    0 80px 160px rgba(0,0,0,0.45);
 }
+
 
 /* ---- ЛЁГКАЯ ТРЯСКА КОНВЕРТА ---- */
 @keyframes envelopeShake {
@@ -86,12 +91,13 @@ height:100%;
 text-align:center;
 }
 
-.card .card-front .logo{ 
-width:120px; 
-height:auto; 
-margin-bottom:10px; 
-filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); 
+.card-front .logo {
+  width: 240px;
+  height: auto;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
 }
+
 
 .card .card-inner{ 
 background: linear-gradient(180deg, var(--inside-bg) 0%, #fefcf7 100%); 
