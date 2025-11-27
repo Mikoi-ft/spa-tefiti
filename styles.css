@@ -64,11 +64,11 @@ body {
 ----------------------------------------------------- */
 @keyframes envelopeShake {
   0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(1.2px); } /* маленькая амплитуда */
+  50% { transform: translateX(3.2px); } /* маленькая амплитуда */
 }
 
 .card.closed {
-  animation: envelopeShake 2s ease-in-out infinite;
+  animation: envelopeShake 1s ease-in-out infinite;
   animation-delay: 2s;
   opacity: 1;
 }
