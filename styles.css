@@ -27,34 +27,18 @@ body {
 /* --------------------------------------------------
    ВНЕШНИЙ КОНТЕЙНЕР КАРТОЧКИ (обертка + тень)
 ----------------------------------------------------- */
-#card-wrap {
-  position: relative;
-  padding: 0;
-  display: inline-block;
-  border-radius: 22px;
-  overflow: visible; /* важно */
-}
-
-/* точная тень, без увеличения, но с запасом на наклон */
 #card-wrap::before {
-  content: "";
-  position: absolute;
-
-  /* увеличиваем только область заливки, НЕ тень */
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
-
-  border-radius: 26px; /* на пару пикселей больше */
-
-  /* сама тень не изменилась – она ровно как ты хотел */
-  box-shadow:
-    0 30px 60px rgba(0,0,0,0.75),
-    0 80px 160px rgba(0,0,0,0.45);
-
-  z-index: -1;
+  display: none;
 }
+
+.card {
+  border-radius: 22px;
+  border: 4px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.7),
+    0 80px 160px rgba(0,0,0,0.45);
+}
+
 
 
 
