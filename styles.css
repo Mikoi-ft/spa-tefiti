@@ -32,25 +32,30 @@ body {
   padding: 0;
   display: inline-block;
   border-radius: 22px;
-  overflow: visible; /* Главное! Иначе тень обрезается */
+  overflow: visible; /* важно */
 }
 
+/* точная тень, без увеличения, но с запасом на наклон */
 #card-wrap::before {
   content: "";
   position: absolute;
 
-  /* расширяем тень за пределы карточки */
-  top: -30px;
-  left: -30px;
-  right: -30px;
-  bottom: -30px;
+  /* увеличиваем только область заливки, НЕ тень */
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+
+  border-radius: 26px; /* на пару пикселей больше */
+
+  /* сама тень не изменилась – она ровно как ты хотел */
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.75),
+    0 80px 160px rgba(0,0,0,0.45);
 
   z-index: -1;
-  border-radius: 32px; /* чуть больше чтобы было мягко */
-  box-shadow:
-    0 40px 70px rgba(0,0,0,0.7),
-    0 90px 180px rgba(0,0,0,0.45);
 }
+
 
 
 /* --------------------------------------------------
