@@ -32,18 +32,26 @@ body {
   padding: 0;
   display: inline-block;
   border-radius: 22px;
+  overflow: visible; /* Главное! Иначе тень обрезается */
 }
 
 #card-wrap::before {
   content: "";
   position: absolute;
-  inset: 0;
+
+  /* расширяем тень за пределы карточки */
+  top: -30px;
+  left: -30px;
+  right: -30px;
+  bottom: -30px;
+
   z-index: -1;
-  border-radius: 22px;
+  border-radius: 32px; /* чуть больше чтобы было мягко */
   box-shadow:
-    0 30px 60px rgba(0,0,0,0.75),
-    0 80px 160px rgba(0,0,0,0.45);
+    0 40px 70px rgba(0,0,0,0.7),
+    0 90px 180px rgba(0,0,0,0.45);
 }
+
 
 /* --------------------------------------------------
    КАРТОЧКА (конверт)
@@ -71,8 +79,8 @@ body {
 }
 
 .card.closed {
-  animation: envelopeSwing 3s ease-in-out infinite;
-  transform-origin: 50% 10%; /* верхний край */
+  animation: envelopeSwing 2s ease-in-out infinite;
+  transform-origin: 50% 5%; /* верхний край */
 }
 
 
@@ -82,7 +90,7 @@ body {
    ЛИЦЕВАЯ СТОРОНА
 ----------------------------------------------------- */
 .card-front {
-  /* background: linear-gradient(120deg, var(--envelope-dark), #123822); */
+  background: linear-gradient(120deg, var(--envelope-dark), #123822);
   color: var(--envelope-gold);
   padding: 36px;
   display: flex;
