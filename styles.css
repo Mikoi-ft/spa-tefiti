@@ -71,8 +71,8 @@ body {
 }
 
 .card.closed {
-  animation: envelopeSwing 1.5s ease-in-out infinite;
-  transform-origin: 10% 5%; /* верхний край */
+  animation: envelopeSwing 3s ease-in-out infinite;
+  transform-origin: 50% 10%; /* верхний край */
 }
 
 
@@ -82,7 +82,7 @@ body {
    ЛИЦЕВАЯ СТОРОНА
 ----------------------------------------------------- */
 .card-front {
-  background: linear-gradient(120deg, var(--envelope-dark), #123822);
+  /* background: linear-gradient(120deg, var(--envelope-dark), #123822); */
   color: var(--envelope-gold);
   padding: 36px;
   display: flex;
