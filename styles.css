@@ -16,6 +16,14 @@ body {
   color: var(--envelope-gold);
 }
 
+.container.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;  /* раньше было 60vh */
+  flex-direction: column;
+}
+
 /* --------------------------------------------------
    ВНЕШНИЙ КОНТЕЙНЕР КАРТОЧКИ (обертка + тень)
 ----------------------------------------------------- */
@@ -55,18 +63,16 @@ body {
    АНИМАЦИЯ ПОКА КОНВЕРТ ЗАКРЫТ
 ----------------------------------------------------- */
 @keyframes envelopeShake {
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-3px); }
-  40% { transform: translateX(3px); }
-  60% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-  100% { transform: translateX(0); }
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(1.2px); } /* маленькая амплитуда */
 }
 
 .card.closed {
-  animation: envelopeShake 0.55s ease-in-out infinite;
+  animation: envelopeShake 2s ease-in-out infinite;
   animation-delay: 2s;
+  opacity: 1;
 }
+
 
 /* --------------------------------------------------
    ЛИЦЕВАЯ СТОРОНА
