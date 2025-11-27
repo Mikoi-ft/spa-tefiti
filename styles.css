@@ -1,11 +1,11 @@
 :root {
   --bg: #1a3a2c;
   --envelope-dark: #0b2a1e;
-  --envelope-gold: #caa94b;
+  --envelope-gold: #E39E3A;
   --inside-bg: #f6f2ec;
   --inside-text: #5a4a2f;
   --card: #fff;
-  --muted: #666;
+  --muted: #6e5a37;
 
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
@@ -103,13 +103,14 @@ body {
    ВНУТРЕННЯЯ СТОРОНА
 ----------------------------------------------------- */
 .card-inner {
-  background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%); /* тёплый бежевый */
-  padding: 36px;
+  background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%);
+  padding: 0; /* <--- убрали */
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 
 
 /* --------------------------------------------------
@@ -119,17 +120,17 @@ body {
   background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%);
   width: 100%;
   height: 100%;
-  padding: 40px;
-  border-radius: 0; /* лист бумаги без скруглений */
+  padding: 36px;    /* Паддинг теперь здесь */
+  box-sizing: border-box; /* <--- главное! */
+  border-radius: 0;
   border: none;
   box-shadow: none;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: var(--inside-text);
-  text-align: center;
 }
+
 
 
 .certificate h2 {
