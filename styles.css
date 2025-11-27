@@ -84,11 +84,13 @@ body {
   padding: 36px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* было center */
   align-items: center;
   height: 100%;
   text-align: center;
+  padding-top: 60px; /* добавили красивый отступ сверху */
 }
+
 
 .card-front .logo {
   width: 240px;
@@ -101,13 +103,14 @@ body {
    ВНУТРЕННЯЯ СТОРОНА
 ----------------------------------------------------- */
 .card-inner {
-  background: linear-gradient(180deg, var(--inside-bg) 0%, #fefcf7 100%);
+  background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%); /* тёплый бежевый */
   padding: 36px;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 
 /* --------------------------------------------------
    СЕРТИФИКАТ ВНУТРИ
