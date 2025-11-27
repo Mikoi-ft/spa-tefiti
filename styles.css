@@ -283,7 +283,7 @@ button:hover {
   }
 
   .certificate {
-    padding: 40px 32px;
+    padding: 40px 36px;
   }
 
   .cert-title {
@@ -313,7 +313,7 @@ button:hover {
 @media (max-width: 600px) {
 
   .certificate {
-    padding: 30px 22px;
+    padding: 30px 26px;
   }
 
   .cert-title {
@@ -347,7 +347,7 @@ button:hover {
 @media (max-width: 420px) {
 
   .certificate {
-    padding: 24px 16px;
+    padding: 24px 20px;
   }
 
   .cert-title {
