@@ -222,12 +222,11 @@ body {
 }
 
 .cert-row .value {
-  font-size: 20px;
-  color: #5a4a2f;
-  flex-grow: 1;                     /* растягивается */
-  text-align: left;
-  opacity: 0.92;
+  font-family: 'Becker', serif;
+  font-size: 28px;    /* было 20px */
+  line-height: 1.35;
 }
+
 
 
 
@@ -270,27 +269,53 @@ button:hover {
 /* --------------------------------------------------
    MOBILE
 ----------------------------------------------------- */
-@media (max-width: 900px) {
-  .card {
-    width: 100%;
-    height: auto;
-    border-radius: 14px;
-  }
-
-  .card-front,
-  .card-inner {
-    padding: 20px;
-  }
-
-  .card-front .logo {
-    width: 150px;
-  }
+/* ---------- MOBILE FIXES ---------- */
+@media (max-width: 650px) {
 
   .certificate {
-    width: 95%;
-    padding: 18px;
+    padding: 30px 24px;
+  }
+
+  .cert-title {
+    font-size: 26px;
+  }
+
+  .cert-row {
+    margin-bottom: 18px;
+    padding-bottom: 4px;
+  }
+
+  .cert-row .label {
+    font-size: 16px;       /* подготовленный текст */
+  }
+
+  .cert-row .value {
+    font-size: 22px;       /* данные из БД */
+  }
+
+  .cert-btn {
+    width: 100%;
+    font-size: 18px;
+    padding: 14px;
+    margin-top: 30px;
   }
 }
+
+/* EXTRA SMALL PHONES  */
+@media (max-width: 420px) {
+  .cert-title {
+    font-size: 22px;
+  }
+
+  .cert-row .label {
+    font-size: 14px;
+  }
+
+  .cert-row .value {
+    font-size: 20px;
+  }
+}
+
 
 @media (max-width: 500px) {
   .certificate h2 { font-size: 20px; }
