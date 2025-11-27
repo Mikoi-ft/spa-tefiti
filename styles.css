@@ -16,12 +16,20 @@ body {
   color: var(--envelope-gold);
 }
 
+.cert-title {
+  font-family: 'Onest', sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #4a3b26;
+}
+
+
 /* Подготовленный текст (подписи) — другой шрифт */
 .cert-row .label {
   font-family: "Onest", sans-serif;  /* или другой, который хочешь */
   font-weight: 700;
   color: #4a3b26;
-  font-size: 16px;
+  font-size: 14px;
   margin-right: 12px;
   white-space: nowrap;
 }
@@ -29,7 +37,7 @@ body {
 /* Данные из БД — оставляем старый Becker */
 .cert-row .value {
   font-family: 'Becker', serif;       /* тот же стиль, что на всей странице */
-  font-size: 28px;
+  font-size: 35px;
   color: #5a4a2f;
   flex-grow: 1;
   text-align: left;
