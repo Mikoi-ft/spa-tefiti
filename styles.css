@@ -55,7 +55,6 @@ body {
   overflow: hidden;
   transition: transform .6s;
   cursor: pointer;
-  background: var(--envelope-dark);
   transform-style: preserve-3d;
 }
 
@@ -72,8 +71,8 @@ body {
 }
 
 .card.closed {
-  animation: envelopeSwing 2s ease-in-out infinite;
-  transform-origin: 30% 5%; /* верхний край */
+  animation: envelopeSwing 1.5s ease-in-out infinite;
+  transform-origin: 10% 5%; /* верхний край */
 }
 
 
