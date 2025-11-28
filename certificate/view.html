@@ -13,9 +13,27 @@
   src: url('/Becker.ttf') format('truetype');
   font-display: swap;
 }
-body { font-family: 'Becker', sans-serif; font-size: 28px; }
-</style>
+body {
+  font-family: 'Becker', sans-serif;
+  font-size: 28px;
+}
 
+/* Кнопка под конвертом */
+#downloadPdfExternal {
+  display: none;
+  margin-top: 30px;
+  padding: 14px 24px;
+  background: #E39E3A;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+  font-size: 22px;
+  transition: 0.25s;
+}
+#downloadPdfExternal:hover { transform: scale(1.05); }
+</style>
 
 </head>
 
@@ -26,49 +44,49 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
 <main class="container center">
 
   <div id="card-wrap">
-
     <div class="card closed">
       
+      <!-- Лицевая сторона -->
       <div class="card-front">
         <img src="/logo.svg" alt="Tefiti SPA" class="logo">
         <h2 style="margin:0;">Подарочный сертификат</h2>
         <p class="small" style="margin:0;">Кликни, чтобы открыть</p>
       </div>
 
+      <!-- Внутри -->
       <div class="card-inner" style="display:none;">
         <div class="certificate">
 
-  <h2 class="cert-title" style="padding-bottom:10px;">ПОДАРОЧНЫЙ СЕРТИФИКАТ</h2>
+          <h2 class="cert-title" style="padding-bottom:10px;">ПОДАРОЧНЫЙ СЕРТИФИКАТ</h2>
 
-  <div class="cert-row">
-    <span class="label">Кому:</span>
-    <span class="value" id="full_name">—</span>
-</div>
+          <div class="cert-row">
+            <span class="label">Кому:</span>
+            <span class="value" id="full_name">—</span>
+          </div>
 
-<div class="cert-row">
-    <span class="label">На услугу / программу:</span>
-    <span class="value" id="program">—</span>
-</div>
+          <div class="cert-row">
+            <span class="label">На услугу / программу:</span>
+            <span class="value" id="program">—</span>
+          </div>
 
-<div class="cert-row">
-    <span class="label">Действителен до:</span>
-    <span class="value" id="date">—</span>
-</div>
+          <div class="cert-row">
+            <span class="label">Действителен до:</span>
+            <span class="value" id="date">—</span>
+          </div>
 
-<div class="cert-row">
-    <span class="label">Уникальный номер:</span>
-    <span class="value" id="code"></span>
-</div>
+          <div class="cert-row">
+            <span class="label">Уникальный номер:</span>
+            <span class="value" id="code"></span>
+          </div>
 
-  <button id="downloadPdf" class="cert-btn">Скачать PDF</button>
-
-</div>
-
+        </div>
       </div>
 
     </div>
-
   </div>
+
+  <!-- ВНЕШНЯЯ КНОПКА СКАЧАТЬ PDF -->
+  <button id="downloadPdfExternal">Скачать PDF</button>
 
   <p id="loading">Загрузка сертификата...</p>
 </main>
@@ -83,14 +101,14 @@ const params = new URLSearchParams(location.search)
 const id = params.get('id')
 
 const loading = document.getElementById('loading')
-const cardWrap = document.querySelector('.card')
+const card = document.querySelector('.card')
 const front = document.querySelector('.card-front')
 const inner = document.querySelector('.card-inner')
 const fullNameEl = document.getElementById('full_name')
 const programEl = document.getElementById('program')
 const dateEl = document.getElementById('date')
 const codeEl = document.getElementById('code')
-const downloadPdfBtn = document.getElementById('downloadPdf')
+const externalPdfBtn = document.getElementById('downloadPdfExternal')
 
 if (!id) {
   loading.textContent = 'Некорректная ссылка (нет id)'
@@ -117,47 +135,67 @@ if (!id) {
     front.addEventListener('click', openCard)
 
     function openCard() {
-      cardWrap.classList.remove('closed')
+      card.classList.remove('closed')
       inner.style.display = 'block'
       front.style.display = 'none'
+
+      externalPdfBtn.style.display = 'inline-block'
+
       startCelebration()
     }
 
-    downloadPdfBtn.onclick = async () => {
+    externalPdfBtn.onclick = async () => {
       const el = document.querySelector('.certificate')
+
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
-      const canvas = await html2canvas(el, { scale: 2 })
-      const img = canvas.toDataURL('image/png')
+
+      const canvas = await html2canvas(el, {
+        scale: 3,           // УЛУЧШЕНОЕ КАЧЕСТВО
+        useCORS: true
+      })
+
+      const img = canvas.toDataURL('image/png', 1.0)
       const { jsPDF } = window.jspdf
-      const pdf = new jsPDF({ orientation: 'landscape' })
-      const imgProps = pdf.getImageProperties(img)
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
-      pdf.addImage(img, 'PNG', 0, 0, pdfWidth, pdfHeight)
+
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      })
+
+      pdf.addImage(img, 'PNG', 0, 0, canvas.width, canvas.height)
       pdf.save(`Tefiti-certificate-${codeEl.textContent}.pdf`)
     }
   })()
 }
 
 function loadScript(src) {
-  return new Promise((res, rej) => {
+  return new Promise((resolve, reject) => {
     const s = document.createElement('script')
     s.src = src
-    s.onload = res
-    s.onerror = rej
+    s.onload = resolve
+    s.onerror = reject
     document.head.appendChild(s)
   })
 }
 
 async function startCelebration() {
   await loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js')
+
   const canvas = document.getElementById('confetti-canvas')
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
-  const myConfetti = confetti.create(canvas, { resize: true, useWorker: true })
+  const blast = confetti.create(canvas, { resize: true, useWorker: true })
 
-  myConfetti({ particleCount: 160, spread: 140, origin: { y: 0.6 }})
+  // Первый основной залп
+  blast({ particleCount: 140, spread: 150, origin: { y: 0.6 } })
+
+  // Дополнительные мягкие всплески
+  setTimeout(() => blast({ particleCount: 90, spread: 120 }), 500)
+  setTimeout(() => blast({ particleCount: 70, spread: 160 }), 900)
+  setTimeout(() => blast({ particleCount: 100, spread: 140, origin: { x: 0.2 } }), 1200)
+  setTimeout(() => blast({ particleCount: 100, spread: 140, origin: { x: 0.8 } }), 1400)
 }
 </script>
 

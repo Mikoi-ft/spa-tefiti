@@ -1,7 +1,7 @@
 :root {
   --bg: #1a3a2c;
   --envelope-dark: #0b2a1e;
-  --envelope-gold: #E39E3A;
+  --envelope-gold: #C89A3A;
   --inside-bg: #f6f2ec;
   --inside-text: #5a4a2f;
   --card: #fff;
@@ -10,11 +10,24 @@
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+/* БАЗОВОЕ ЦЕНТРИРОВАНИЕ АВТОРИЗАЦИИ */
 body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
   background: var(--bg);
   margin: 0;
   color: var(--envelope-gold);
 }
+
+/* Чтобы заголовок тоже был по центру */
+h1, .admin-title {
+  text-align: center;
+  width: 100%;
+}
+
 
 .cert-title {
   font-family: 'Onest', sans-serif !important;
