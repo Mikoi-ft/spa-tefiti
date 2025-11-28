@@ -1,7 +1,7 @@
 :root {
   --bg: #1a3a2c;
   --envelope-dark: #0b2a1e;
-  --envelope-gold: #C89A3A;
+  --envelope-gold: rgb(194, 146, 44);
   --inside-bg: #f6f2ec;
   --inside-text: #5a4a2f;
   --card: #fff;
@@ -386,3 +386,113 @@ button:hover {
 }
 
 
+/**********************************************
+  АДМИН-ПАНЕЛЬ — АДАПТИВНОЕ ВЫРАВНИВАНИЕ
+  Работает только если body имеет класс .admin-page
+***********************************************/
+
+.admin-page {
+  display: block !important;   /* отменяем глобальный flex из body */
+  padding: 40px 20px;
+}
+
+.admin-page main.container {
+  max-width: 700px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Заголовок */
+.admin-page h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--envelope-gold);
+}
+
+/* Авторизация */
+.admin-page #login-area,
+.admin-page #user-info,
+.admin-page #createForm,
+.admin-page #check-area,
+.admin-page #result {
+  background: rgba(255,255,255,0.04);
+  padding: 18px 22px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+/* Поля и подписи */
+.admin-page label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  color: var(--envelope-gold);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.admin-page input {
+  padding: 10px 12px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+/* Кнопки */
+.admin-page button {
+  background: var(--envelope-gold);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-page button:hover {
+  transform: scale(1.05);
+}
+
+/* Выравнивание полей создания сертификата */
+@media (min-width: 600px) {
+  .admin-page #createForm label {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin-page #createForm label input {
+    width: 60%;
+    margin-top: 0;
+  }
+}
+
+/* Поле + кнопка в проверке */
+.admin-page #check-area input {
+  width: calc(100% - 150px);
+  display: inline-block;
+}
+
+.admin-page #check-area button {
+  width: 140px;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+/* Адаптив */
+@media (max-width: 500px) {
+  .admin-page #check-area input,
+  .admin-page #check-area button {
+    width: 100%;
+    margin: 6px 0;
+  }
+
+  .admin-page #login-area input,
+  .admin-page #login-area button {
+    width: 100%;
+    margin: 6px 0;
+  }
+}
