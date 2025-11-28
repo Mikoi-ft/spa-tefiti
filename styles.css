@@ -1,4 +1,7 @@
 /* ---------------- Глобальные переменные ---------------- */
+/* ============================================================
+   ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+============================================================ */
 :root {
   --bg: #1a3a2c;
   --envelope-dark: #0b2a1e;
@@ -8,28 +11,35 @@
   --muted: #6e5a37;
 }
 
-/* ---------------- Основной фон ---------------- */
+/* ============================================================
+   БАЗОВАЯ СЕТКА СТРАНИЦЫ СЕРТИФИКАТА
+============================================================ */
 body.page {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  background: var(--bg);
+  justify-content: center !important;   /* центр по вертикали */
+  align-items: center !important;       /* центр по горизонтали */
   min-height: 100vh;
-  padding: 40px 0;
   margin: 0;
+  padding: 0;
+  background: var(--bg);
+  flex-direction: column;
 }
 
-/* ---------------- Контейнер конверта ---------------- */
+/* ============================================================
+   КОНТЕЙНЕР КАРТОЧКИ
+============================================================ */
 #card-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
   padding: 0 16px;
   box-sizing: border-box;
+  margin-bottom: 24px;
 }
 
-/* ---------------- Карточка ---------------- */
+/* ============================================================
+   КАРТОЧКА (КОНВЕРТ)
+============================================================ */
 .card {
   width: 820px;
   max-width: 100%;
@@ -46,7 +56,7 @@ body.page {
   transition: 0.5s;
 }
 
-/* Анимация */
+/* Анимация покачивания */
 .card.closed {
   animation: envelopeSwing 2s ease-in-out infinite;
   transform-origin: 50% 5%;
@@ -59,7 +69,9 @@ body.page {
   100% { transform: rotate(0deg); }
 }
 
-/* ---------------- Лицевая сторона ---------------- */
+/* ============================================================
+   ЛИЦЕВАЯ СТОРОНА КАРТОЧКИ
+============================================================ */
 .card-front {
   background: linear-gradient(180deg, var(--envelope-dark), #123822);
   padding: 55px 20px;
@@ -83,21 +95,25 @@ body.page {
   margin: 0;
 }
 
-/* ---------------- Внутренность конверта ---------------- */
+/* ============================================================
+   ВНУТРЕННЯЯ СТОРОНА
+============================================================ */
 .card-inner {
   background: linear-gradient(180deg, #f3e8d3, #efe1c7);
-  width: 100%;                 /* FIX #1 */
+  width: 100%;        /* ключевой фикс */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* ---------------- Сертификат ---------------- */
+/* ============================================================
+   СЕРТИФИКАТ ВНУТРИ
+============================================================ */
 .certificate {
   width: 100%;
-  max-width: 100%;             /* FIX #2 */
-  padding: 32px 32px;          /* уменьшены паддинги */
+  max-width: 100%;
   box-sizing: border-box;
+  padding: 32px 32px;   /* сбалансировано */
   background: linear-gradient(180deg,#f2e7d3,#ecddc2);
 }
 
@@ -112,7 +128,7 @@ body.page {
 .cert-row {
   width: 100%;
   display: flex;
-  flex-wrap: wrap;             /* FIX #3 — текст переносится */
+  flex-wrap: wrap;  /* перенос строк */
   gap: 10px;
   border-bottom: 1px solid rgba(0,0,0,0.25);
   padding-bottom: 6px;
@@ -131,19 +147,23 @@ body.page {
   font-family: 'Becker', serif;
   font-size: 24px;
   line-height: 1.35;
-  word-break: break-word;      /* длинные имена не ломают верстку */
+  word-break: break-word; /* длинные слова не ломают макет */
 }
 
-/* ---------------- Адаптив ---------------- */
+/* ============================================================
+   АДАПТИВ
+============================================================ */
 
-/* Большие телефоны / планшеты */
+/* --- планшеты --- */
 @media (max-width: 900px) {
   .card-front .logo { width: 200px; }
   .card-front h2 { font-size: 28px; }
+
   .certificate { padding: 28px 24px; }
+  .cert-title { font-size: 30px; }
 }
 
-/* Телефоны */
+/* --- телефоны --- */
 @media (max-width: 600px) {
   #card-wrap { padding: 0 12px; }
 
@@ -156,7 +176,7 @@ body.page {
   .cert-row .value { font-size: 20px; }
 }
 
-/* Маленькие телефоны */
+/* --- маленькие телефоны (iPhone SE) --- */
 @media (max-width: 420px) {
   #card-wrap { padding: 0 8px; }
 
@@ -166,6 +186,7 @@ body.page {
   .certificate { padding: 18px 12px; }
   .cert-title { font-size: 22px; }
 }
+
 
 /* --------------------------------------------------
    АДМИН-ПАНЕЛЬ
