@@ -1,4 +1,4 @@
-/* --- Глобальные переменные --- */
+/* ---------------- Глобальные переменные ---------------- */
 :root {
   --bg: #1a3a2c;
   --envelope-dark: #0b2a1e;
@@ -8,48 +8,45 @@
   --muted: #6e5a37;
 }
 
-/* --- Основной фон страницы сертификата --- */
+/* ---------------- Основной фон ---------------- */
 body.page {
   display: flex;
-  justify-content: center;
-  align-items: flex-start; /* важно — убирает центрирование по вертикали */
   flex-direction: column;
-  min-height: 100vh;
-  margin: 0;
+  justify-content: flex-start;
+  align-items: center;
   background: var(--bg);
-  padding-top: 40px; /* чтобы не прилипало к верху */
+  min-height: 100vh;
+  padding: 40px 0;
+  margin: 0;
 }
 
-/* --------------------------------------------------
-   КОНТЕЙНЕР КОНВЕРТА
--------------------------------------------------- */
-
+/* ---------------- Контейнер конверта ---------------- */
 #card-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 16px; /* безопасный отступ на телефонах */
+  padding: 0 16px;
   box-sizing: border-box;
-  margin-bottom: 20px;
 }
 
-/* Карточка (конверт) */
+/* ---------------- Карточка ---------------- */
 .card {
-  width: 820px;         
-  max-width: 100%;      /* чтобы никогда не вылазило */
-  height: auto;
+  width: 820px;
+  max-width: 100%;
   border-radius: 22px;
   overflow: hidden;
   cursor: pointer;
+
   border: 4px solid rgba(255,255,255,0.08);
   box-shadow:
     0 30px 60px rgba(0,0,0,0.7),
     0 80px 160px rgba(0,0,0,0.45);
+
   transform-style: preserve-3d;
   transition: 0.5s;
 }
 
-/* Анимация покачивания */
+/* Анимация */
 .card.closed {
   animation: envelopeSwing 2s ease-in-out infinite;
   transform-origin: 50% 5%;
@@ -62,15 +59,13 @@ body.page {
   100% { transform: rotate(0deg); }
 }
 
-/* --------------------------------------------------
-   ЛИЦЕВАЯ СТОРОНА
--------------------------------------------------- */
-
+/* ---------------- Лицевая сторона ---------------- */
 .card-front {
   background: linear-gradient(180deg, var(--envelope-dark), #123822);
   padding: 55px 20px;
   text-align: center;
   color: var(--envelope-gold);
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,41 +83,36 @@ body.page {
   margin: 0;
 }
 
-/* --------------------------------------------------
-   ВНУТРЕННЯЯ СТОРОНА
--------------------------------------------------- */
-
+/* ---------------- Внутренность конверта ---------------- */
 .card-inner {
-  background: linear-gradient(180deg,#f3e8d3,#efe1c7);
+  background: linear-gradient(180deg, #f3e8d3, #efe1c7);
+  width: 100%;                 /* FIX #1 */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* --------------------------------------------------
-   СЕРТИФИКАТ
--------------------------------------------------- */
-
+/* ---------------- Сертификат ---------------- */
 .certificate {
   width: 100%;
-  max-width: 100%;     /* главный фикс, не даёт блоку вылезать */
-  padding: 40px 40px;
+  max-width: 100%;             /* FIX #2 */
+  padding: 32px 32px;          /* уменьшены паддинги */
   box-sizing: border-box;
   background: linear-gradient(180deg,#f2e7d3,#ecddc2);
 }
 
 .cert-title {
   font-family: 'Onest', sans-serif;
-  font-size: 36px;
+  font-size: 34px;
   margin: 0 0 15px 0;
   color: #4a3b26;
 }
 
-/* Строки */
+/* Строки сертификата */
 .cert-row {
   width: 100%;
   display: flex;
-  flex-wrap: wrap;   /* текст переносится, не ломает макет */
+  flex-wrap: wrap;             /* FIX #3 — текст переносится */
   gap: 10px;
   border-bottom: 1px solid rgba(0,0,0,0.25);
   padding-bottom: 6px;
@@ -139,20 +129,18 @@ body.page {
 
 .cert-row .value {
   font-family: 'Becker', serif;
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1.35;
-  word-break: break-word; /* длинные имена → НЕ ломают верстку */
+  word-break: break-word;      /* длинные имена не ломают верстку */
 }
 
-/* --------------------------------------------------
-   АДАПТИВ
--------------------------------------------------- */
+/* ---------------- Адаптив ---------------- */
 
-/* Планшеты */
+/* Большие телефоны / планшеты */
 @media (max-width: 900px) {
   .card-front .logo { width: 200px; }
   .card-front h2 { font-size: 28px; }
-  .certificate { padding: 32px 26px; }
+  .certificate { padding: 28px 24px; }
 }
 
 /* Телефоны */
@@ -162,9 +150,9 @@ body.page {
   .card-front .logo { width: 150px; }
   .card-front h2 { font-size: 24px; }
 
-  .certificate { padding: 26px 18px; }
-  .cert-title { font-size: 28px; }
-  .cert-row .label { font-size: 16px; }
+  .certificate { padding: 22px 16px; }
+  .cert-title { font-size: 26px; }
+  .cert-row .label { font-size: 15px; }
   .cert-row .value { font-size: 20px; }
 }
 
@@ -175,11 +163,9 @@ body.page {
   .card-front .logo { width: 120px; }
   .card-front h2 { font-size: 20px; }
 
-  .certificate { padding: 20px 14px; }
-  .cert-title { font-size: 24px; }
+  .certificate { padding: 18px 12px; }
+  .cert-title { font-size: 22px; }
 }
-
-
 
 /* --------------------------------------------------
    АДМИН-ПАНЕЛЬ
