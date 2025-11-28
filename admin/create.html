@@ -4,14 +4,18 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Admin — Создание и проверка сертификатов | Tefiti SPA</title>
+
 <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body class="page admin-page">
 <main class="container">
+
   <h1>Админ — Создание и проверка сертификатов</h1>
 
   <!-- Авторизация -->
   <div id="auth-area">
+
     <div id="login-area">
       <p>Введите пароль администратора</p>
       <input id="adminPassword" type="password" placeholder="Пароль" />
@@ -23,29 +27,37 @@
       <p>Вы вошли как админ</p>
       <button id="signout">Выйти</button>
     </div>
+
   </div>
 
   <!-- Форма создания сертификата -->
   <form id="createForm" style="display:none; margin-top:20px;">
     <h2>Создание сертификата</h2>
+
     <label>ФИО:
       <input id="full_name" required />
     </label>
+
     <label>Программа / Стоимость:
       <input id="program" placeholder="Например: SPA-релакс — 60$" />
     </label>
+
     <label>Дата действия сертификата:
       <input id="date" type="date" />
     </label>
+
     <button type="submit">Создать сертификат</button>
   </form>
 
+  <!-- Результат создания -->
   <div id="result" style="display:none; margin-top:20px;">
     <p>Сертификат создан!</p>
     <p>Код: <b id="codeOut"></b></p>
+
     <p>Ссылка:
-      <input id="shareLink" readonly style="width:100%"/>
+      <input id="shareLink" readonly style="width:100%" />
     </p>
+
     <button id="copyLink">Скопировать ссылку</button>
     <a id="openLink" target="_blank" style="margin-left:10px;">Открыть сертификат</a>
   </div>
@@ -53,12 +65,17 @@
   <!-- Проверка сертификата -->
   <div id="check-area" style="display:none;">
     <h2>Проверка сертификата по коду</h2>
+
     <input id="checkCode" maxlength="5" placeholder="Введите 5-значный код" />
     <button id="checkBtn">Проверить</button>
+
     <div id="checkResult" style="margin-top:10px;"></div>
   </div>
 
 </main>
+
+
+<!-- ------------------------- JS ---------------------------- -->
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -66,7 +83,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// Элементы
+// элементы
 const loginBtn = document.getElementById('loginBtn')
 const passwordInput = document.getElementById('adminPassword')
 const loginMsg = document.getElementById('loginMsg')
@@ -83,45 +100,57 @@ const shareLink = document.getElementById('shareLink')
 const copyLinkBtn = document.getElementById('copyLink')
 const openLinkA = document.getElementById('openLink')
 
-// Проверка сертификата
 const checkArea = document.getElementById('check-area')
 const checkBtn = document.getElementById('checkBtn')
 const checkCodeInput = document.getElementById('checkCode')
 const checkResult = document.getElementById('checkResult')
 
-// ---------- Локальная авторизация ----------
+// пароль
 const ADMIN_PASSWORD = "tefiti000"
 
+
+/* ---------------- Авторизация ---------------- */
 loginBtn.onclick = () => {
   const pw = passwordInput.value.trim()
-  if (!pw) { loginMsg.textContent = 'Введите пароль'; return }
-  if (pw === ADMIN_PASSWORD){
-    loginArea.style.display = 'none'
-    userInfo.style.display = 'block'
-    createForm.style.display = 'block'
-    checkArea.style.display = 'block'
-    loginMsg.textContent = ''
+
+  if (!pw) {
+    loginMsg.textContent = "Введите пароль"
+    return
+  }
+
+  if (pw === ADMIN_PASSWORD) {
+    loginArea.style.display = "none"
+    userInfo.style.display = "block"
+    createForm.style.display = "block"
+    checkArea.style.display = "block"
+    loginMsg.textContent = ""
   } else {
-    loginMsg.textContent = 'Неверный пароль'
+    loginMsg.textContent = "Неверный пароль"
   }
 }
 
 signoutBtn.onclick = () => {
-  passwordInput.value = ''
-  loginMsg.textContent = ''
-  createForm.style.display = 'none'
-  userInfo.style.display = 'none'
-  loginArea.style.display = 'block'
-  checkArea.style.display = 'none'
+  passwordInput.value = ""
+  loginMsg.textContent = ""
+  createForm.style.display = "none"
+  userInfo.style.display = "none"
+  loginArea.style.display = "block"
+  checkArea.style.display = "none"
 }
 
-// ---------- Создание сертификата через RPC ----------
+
+/* ------------ Создание сертификата ----------------- */
 createForm.onsubmit = async (e) => {
   e.preventDefault()
+
   const full_name = fullNameInput.value.trim()
   const program = programInput.value.trim()
   const date = dateInput.value || null
-  if (!full_name) { alert('Введите ФИО'); return }
+
+  if (!full_name) {
+    alert("Введите ФИО")
+    return
+  }
 
   const { data, error } = await supabase.rpc('insert_certificate_with_password', {
     p_password: ADMIN_PASSWORD,
@@ -130,7 +159,10 @@ createForm.onsubmit = async (e) => {
     p_date: date
   })
 
-  if (error) { alert('Ошибка при сохранении: ' + error.message); return }
+  if (error) {
+    alert("Ошибка: " + error.message)
+    return
+  }
 
   const id = data[0].cert_id
   const code = data[0].cert_code
@@ -140,23 +172,34 @@ createForm.onsubmit = async (e) => {
   const link = `${location.origin}/certificate/view.html?id=${id}`
   shareLink.value = link
   openLinkA.href = link
-  openLinkA.textContent = 'Открыть сертификат'
 
-  resultBox.style.display = 'block'
+  resultBox.style.display = "block"
 }
 
-// ---------- Проверка сертификата по коду ----------
+// копирование ссылки после создания
+copyLinkBtn.onclick = () => {
+  navigator.clipboard.writeText(shareLink.value)
+    .then(() => alert("Ссылка скопирована!"))
+}
+
+
+/* ------------ Проверка сертификата ----------------- */
+
 checkBtn.onclick = async () => {
   const code = checkCodeInput.value.trim()
-  if (!/^\d{5}$/.test(code)){ alert("Введите корректный 5-значный код"); return }
+
+  if (!/^\d{5}$/.test(code)) {
+    alert("Введите корректный 5-значный код")
+    return
+  }
 
   const { data, error } = await supabase
-    .from('certificates')
-    .select('*')
-    .eq('code', code)
+    .from("certificates")
+    .select("*")
+    .eq("code", code)
     .single()
 
-  if (error || !data){
+  if (error || !data) {
     checkResult.innerHTML = `<p style="color:red">❌ Сертификат не найден</p>`
     return
   }
@@ -169,22 +212,26 @@ checkBtn.onclick = async () => {
     <p><b>Программа:</b> ${data.program || '-'}</p>
     <p><b>Дата:</b> ${data.date || '-'}</p>
     <p><b>Создан:</b> ${new Date(data.created_at).toLocaleString()}</p>
-    <p>Ссылка на сертификат:
-      <input id="checkShareLink" value="${link}" readonly style="width:100%"/>
-      <button id="checkCopyLinkBtn">Скопировать ссылку</button>
+
+    <p>Ссылка:
+      <input value="${link}" readonly style="width:100%" />
+      <button class="checkCopyLinkBtn">Скопировать ссылку</button>
     </p>
   `
 
-  // копирование ссылки
-  document.getElementById('checkCopyLinkBtn').onclick = () => {
-    const textToCopy = `Ваш подарочный сертификат на SPA Tefiti доступен по ссылке ${link}`
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        alert('Ссылка скопирована!')
-      })
-      .catch(err => alert('Не удалось скопировать: ' + err))
+  // правильное подключение кнопки копирования
+  const copyBtn = checkResult.querySelector(".checkCopyLinkBtn")
+
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      const text = `Ваш подарочный сертификат доступен по ссылке ${link}`
+      navigator.clipboard.writeText(text)
+        .then(() => alert("Ссылка скопирована!"))
+    }
   }
 }
+
 </script>
+
 </body>
 </html>
