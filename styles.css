@@ -10,8 +10,10 @@
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* БАЗОВОЕ ЦЕНТРИРОВАНИЕ АВТОРИЗАЦИИ */
-body {
+/* --------------------------------------------------
+   ГЛОБАЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ (кроме admin-page)
+----------------------------------------------------- */
+body.page {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,73 +24,38 @@ body {
   color: var(--envelope-gold);
 }
 
-/* Чтобы заголовок тоже был по центру */
 h1, .admin-title {
   text-align: center;
   width: 100%;
 }
 
-.cert-title {
-  font-family: 'Onest', sans-serif !important;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #4a3b26;
-}
-
-
-/* Подготовленный текст (подписи) */
-.cert-row .label {
-  font-family: "Onest", sans-serif;
-  font-weight: 700;
-  color: #4a3b26;
-  font-size: 14px;
-  margin-right: 12px;
-  white-space: nowrap;
-}
-
-/* Данные из БД */
-.cert-row .value {
-  font-family: 'Becker', serif;
-  font-size: 20px;
-  color: #5a4a2f;
-  flex-grow: 1;
-  text-align: left;
-  opacity: 0.95;
-}
-
-.container.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  flex-direction: column;
-}
-
 /* --------------------------------------------------
-   КОНВЕРТ (внешний контейнер)
+   СТИЛИ КОНВЕРТА
 ----------------------------------------------------- */
+
 #card-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 12px; /* FIX — защита от касания краёв на мобильных */
+  padding: 0 12px; /* защита от касания краёв */
+  box-sizing: border-box;
 }
 
 .card {
   border-radius: 22px;
   border: 4px solid rgba(255,255,255,0.08);
+  width: min(820px, 100%);
+  height: 460px;
+  overflow: hidden;
   box-shadow:
     0 30px 60px rgba(0,0,0,0.7),
     0 80px 160px rgba(0,0,0,0.45);
-  width: 820px;
-  height: 460px;
-  overflow: hidden;
   transition: transform .6s;
   cursor: pointer;
   transform-style: preserve-3d;
 }
 
-/* Анимация */
+/* Анимация конверта */
 @keyframes envelopeSwing {
   0%   { transform: rotateZ(0deg); }
   20%  { transform: rotateZ(1.4deg); }
@@ -106,6 +73,7 @@ h1, .admin-title {
 /* --------------------------------------------------
    ЛИЦЕВАЯ СТОРОНА
 ----------------------------------------------------- */
+
 .card-front {
   background: linear-gradient(120deg, var(--envelope-dark), #123822);
   color: var(--envelope-gold);
@@ -120,13 +88,11 @@ h1, .admin-title {
 }
 
 .card-front .logo {
-  width: 300px; /* FIX — было 320 */
-  height: auto;
+  width: 300px;
   margin-bottom: 14px;
   filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
 }
 
-/* FIX — уменьшение большого заголовка */
 .card-front h2 {
   font-size: 34px;
   margin: 0;
@@ -135,6 +101,7 @@ h1, .admin-title {
 /* --------------------------------------------------
    ВНУТРЕННЯЯ СТОРОНА
 ----------------------------------------------------- */
+
 .card-inner {
   background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%);
   height: 100%;
@@ -143,14 +110,11 @@ h1, .admin-title {
   justify-content: center;
 }
 
-/* --------------------------------------------------
-   СЕРТИФИКАТ ВНУТРИ
------------------------------------------------------ */
 .certificate {
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #f2e7d3, #ecddc2);
   padding: 60px 80px;
+  background: linear-gradient(180deg, #f2e7d3, #ecddc2);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -158,63 +122,102 @@ h1, .admin-title {
   font-family: 'Becker', serif;
 }
 
+/* Заголовок внутри */
+.cert-title {
+  font-family: 'Onest', sans-serif !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #4a3b26;
+  font-size: 40px;
+  margin: 0 0 12px 0;
+}
+
+/* Поля */
+.cert-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+  padding-bottom: 6px;
+}
+
+.cert-row .label {
+  font-family: "Onest", sans-serif;
+  font-weight: 700;
+  color: #4a3b26;
+  font-size: 18px;
+  margin-right: 12px;
+  white-space: nowrap;
+}
+
+.cert-row .value {
+  font-family: 'Becker', serif;
+  font-size: 26px;
+  line-height: 1.35;
+}
+
 /* --------------------------------------------------
-   MOBILE
+   АДАПТИВ КОНВЕРТА
 ----------------------------------------------------- */
 
 /* Планшеты */
 @media (max-width: 900px) {
-  .card {
-    width: 100%;
-    height: auto; /* FIX */
-  }
-
-  .card-front .logo {
-    width: 180px;
-  }
-
+  .card { height: auto; }
+  .card-front .logo { width: 200px; }
   .card-front h2 { font-size: 30px; }
+
+  .certificate { padding: 40px 36px; }
 }
 
 /* Телефоны */
 @media (max-width: 600px) {
 
-  #card-wrap { padding: 0 10px; }  /* FIX */
+  #card-wrap { padding: 0 10px; }
 
-  .card {
-    border-radius: 20px;
-    width: 100%;
+  .card-front .logo { width: 150px; }
+  .card-front h2 { font-size: 26px; }
+
+  .certificate {
+    padding: 30px 26px !important;
   }
 
-  .card-front .logo {
-    width: 150px;
+  .cert-title {
+    font-size: 28px;
   }
 
-  .card-front h2 { font-size: 26px; } /* FIX */
+  .cert-row .label { font-size: 16px; }
+  .cert-row .value { font-size: 22px; }
 }
 
 /* Маленькие телефоны */
 @media (max-width: 420px) {
 
-  #card-wrap { padding: 0 8px; } /* FIX */
+  #card-wrap { padding: 0 8px; }
 
-  .card-front .logo {
-    width: 120px;
+  .card-front .logo { width: 120px; }
+  .card-front h2 { font-size: 22px; }
+
+  .certificate {
+    padding: 22px 14px !important;
   }
 
-  .card-front h2 { font-size: 22px; } /* FIX */
+  .cert-title { font-size: 22px; }
+  .cert-row .label { font-size: 14px; }
+  .cert-row .value { font-size: 20px; }
 }
 
-
-
-/**********************************************
-  АДМИН-ПАНЕЛЬ — АДАПТИВНОЕ ВЫРАВНИВАНИЕ
-  Работает только если body имеет класс .admin-page
-***********************************************/
+/* --------------------------------------------------
+   АДМИН-ПАНЕЛЬ
+----------------------------------------------------- */
 
 .admin-page {
-  display: block !important;   /* отменяем глобальный flex из body */
+  display: block !important;
   padding: 40px 20px;
+  background: var(--bg);
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .admin-page main.container {
@@ -223,14 +226,13 @@ h1, .admin-title {
   width: 100%;
 }
 
-/* Заголовок */
 .admin-page h1 {
   text-align: center;
   margin-bottom: 25px;
   color: var(--envelope-gold);
 }
 
-/* Авторизация */
+/* Контейнеры */
 .admin-page #login-area,
 .admin-page #user-info,
 .admin-page #createForm,
@@ -242,7 +244,7 @@ h1, .admin-title {
   margin-bottom: 25px;
 }
 
-/* Поля и подписи */
+/* Поля */
 .admin-page label {
   display: flex;
   flex-direction: column;
@@ -277,21 +279,19 @@ h1, .admin-title {
   transform: scale(1.05);
 }
 
-/* Выравнивание полей создания сертификата */
+/* Поля создания сертификата */
 @media (min-width: 600px) {
   .admin-page #createForm label {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
-
   .admin-page #createForm label input {
     width: 60%;
-    margin-top: 0;
   }
 }
 
-/* Поле + кнопка в проверке */
+/* Проверка сертификата — поле + кнопка */
 .admin-page #check-area input {
   width: calc(100% - 150px);
   display: inline-block;
@@ -305,6 +305,7 @@ h1, .admin-title {
 
 /* Адаптив */
 @media (max-width: 500px) {
+
   .admin-page #check-area input,
   .admin-page #check-area button {
     width: 100%;
@@ -318,14 +319,13 @@ h1, .admin-title {
   }
 }
 
-/* --- ФИКС ширины полей в админке --- */
+/* Фикс ширины */
 .admin-page #login-area input,
 .admin-page #check-area input {
   width: 100% !important;
-  box-sizing: border-box;
 }
 
-/* Кнопки под ними, а не справа */
+/* Кнопки под полями */
 .admin-page #check-area button,
 .admin-page #login-area button {
   width: 100%;
@@ -335,6 +335,7 @@ h1, .admin-title {
 
 /* Для больших экранов — красиво в линию */
 @media (min-width: 600px) {
+
   .admin-page #check-area {
     display: flex;
     flex-direction: row;
@@ -342,14 +343,8 @@ h1, .admin-title {
     gap: 12px;
   }
 
-  .admin-page #check-area input {
-    width: 60% !important;
-  }
-
-  .admin-page #check-area button {
-    width: 40%;
-    margin-top: 0;
-  }
+  .admin-page #check-area input { width: 60% !important; }
+  .admin-page #check-area button { width: 40%; margin-top: 0; }
 
   .admin-page #login-area {
     display: flex;
@@ -358,12 +353,6 @@ h1, .admin-title {
     gap: 12px;
   }
 
-  .admin-page #login-area input {
-    width: 65% !important;
-  }
-
-  .admin-page #login-area button {
-    width: 35%;
-    margin-top: 0;
-  }
+  .admin-page #login-area input { width: 65% !important; }
+  .admin-page #login-area button { width: 35%; margin-top: 0; }
 }
