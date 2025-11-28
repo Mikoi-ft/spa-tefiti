@@ -23,17 +23,19 @@ body.page {
    КОНТЕЙНЕР КОНВЕРТА
 -------------------------------------------------- */
 
+/* Контейнер конверта */
 #card-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 16px; /* FIX — защита от краёв */
+  padding: 40px 20px; /* Больше воздуха сверху/снизу */
   box-sizing: border-box;
 }
 
+/* Карточка (конверт) */
 .card {
-  width: min(820px, 100%);
-  max-width: 95vw;
+  width: 820px;          /* Чётко фиксированный красивый размер на ПК */
+  max-width: 95vw;       /* Адаптивно на телефонах */
   height: 460px;
   border-radius: 22px;
   overflow: hidden;
@@ -44,9 +46,10 @@ body.page {
     0 80px 160px rgba(0,0,0,0.45);
   transform-style: preserve-3d;
   transition: 0.5s;
+  margin: 0 auto; /* Центрирование гарантировано */
 }
 
-/* Анимация */
+/* Анимация покачивания */
 .card.closed {
   animation: envelopeSwing 2s ease-in-out infinite;
   transform-origin: 50% 5%;
@@ -54,18 +57,15 @@ body.page {
 
 @keyframes envelopeSwing {
   0% { transform: rotate(0deg); }
-  25% { transform: rotate(2deg); }
-  50% { transform: rotate(-2deg); }
+  25% { transform: rotate(1.8deg); }
+  50% { transform: rotate(-1.8deg); }
   100% { transform: rotate(0deg); }
 }
 
-/* --------------------------------------------------
-   ЛИЦЕВАЯ СТОРОНА
--------------------------------------------------- */
-
+/* Лицевая сторона */
 .card-front {
   background: linear-gradient(180deg, var(--envelope-dark), #123822);
-  padding: 50px 20px;
+  padding: 55px 20px; /* Немного больше сверху, красиво */
   text-align: center;
   color: var(--envelope-gold);
   display: flex;
@@ -74,14 +74,19 @@ body.page {
   justify-content: flex-start;
 }
 
+/* Логотип */
 .card-front .logo {
-  width: 260px;
-  margin-bottom: 14px;
+  width: 280px; /* Чуть крупнее, красиво на ПК */
+  max-width: 70%;
+  margin-bottom: 16px;
 }
 
+/* Заголовок */
 .card-front h2 {
-  font-size: 34px;
+  font-size: 32px; /* слегка уменьшен для баланса */
+  margin: 0;
 }
+
 
 /* --------------------------------------------------
    ВНУТРЕННЯЯ СТОРОНА
