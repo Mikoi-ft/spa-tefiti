@@ -496,3 +496,53 @@ button:hover {
     margin: 6px 0;
   }
 }
+
+/* --- ФИКС ширины полей в админке --- */
+.admin-page #login-area input,
+.admin-page #check-area input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* Кнопки под ними, а не справа */
+.admin-page #check-area button,
+.admin-page #login-area button {
+  width: 100%;
+  margin-left: 0 !important;
+  margin-top: 10px;
+}
+
+/* Для больших экранов — красиво в линию */
+@media (min-width: 600px) {
+  .admin-page #check-area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .admin-page #check-area input {
+    width: 60% !important;
+  }
+
+  .admin-page #check-area button {
+    width: 40%;
+    margin-top: 0;
+  }
+
+  .admin-page #login-area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .admin-page #login-area input {
+    width: 65% !important;
+  }
+
+  .admin-page #login-area button {
+    width: 35%;
+    margin-top: 0;
+  }
+}
