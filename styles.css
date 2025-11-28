@@ -15,7 +15,8 @@
 ============================================================ */
 body.page {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;   /* центр по вертикали */
+  align-items: center;    
   align-items: center;
   flex-direction: column;
   min-height: 100vh;
@@ -48,6 +49,7 @@ body.page {
   width: 100%;
   max-width: 820px;
   aspect-ratio: 820 / 460;
+  height: auto;
   border-radius: 22px;
   overflow: hidden;
   cursor: pointer;
