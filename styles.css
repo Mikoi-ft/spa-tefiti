@@ -28,7 +28,6 @@ h1, .admin-title {
   width: 100%;
 }
 
-
 .cert-title {
   font-family: 'Onest', sans-serif !important;
   font-weight: 700;
@@ -37,9 +36,9 @@ h1, .admin-title {
 }
 
 
-/* Подготовленный текст (подписи) — другой шрифт */
+/* Подготовленный текст (подписи) */
 .cert-row .label {
-  font-family: "Onest", sans-serif;  /* или другой, который хочешь */
+  font-family: "Onest", sans-serif;
   font-weight: 700;
   color: #4a3b26;
   font-size: 14px;
@@ -47,9 +46,9 @@ h1, .admin-title {
   white-space: nowrap;
 }
 
-/* Данные из БД — оставляем старый Becker */
+/* Данные из БД */
 .cert-row .value {
-  font-family: 'Becker', serif;       /* тот же стиль, что на всей странице */
+  font-family: 'Becker', serif;
   font-size: 20px;
   color: #5a4a2f;
   flex-grow: 1;
@@ -57,20 +56,22 @@ h1, .admin-title {
   opacity: 0.95;
 }
 
-
 .container.center {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;  /* раньше было 60vh */
+  min-height: 100vh;
   flex-direction: column;
 }
 
 /* --------------------------------------------------
-   ВНЕШНИЙ КОНТЕЙНЕР КАРТОЧКИ (обертка + тень)
+   КОНВЕРТ (внешний контейнер)
 ----------------------------------------------------- */
-#card-wrap::before {
-  display: none;
+#card-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 12px; /* FIX — защита от касания краёв на мобильных */
 }
 
 .card {
@@ -79,27 +80,15 @@ h1, .admin-title {
   box-shadow:
     0 30px 60px rgba(0,0,0,0.7),
     0 80px 160px rgba(0,0,0,0.45);
-}
-
-
-
-
-/* --------------------------------------------------
-   КАРТОЧКА (конверт)
------------------------------------------------------ */
-.card {
   width: 820px;
   height: 460px;
-  border-radius: 22px;
   overflow: hidden;
   transition: transform .6s;
   cursor: pointer;
   transform-style: preserve-3d;
 }
 
-/* --------------------------------------------------
-   АНИМАЦИЯ ПОКА КОНВЕРТ ЗАКРЫТ
------------------------------------------------------ */
+/* Анимация */
 @keyframes envelopeSwing {
   0%   { transform: rotateZ(0deg); }
   20%  { transform: rotateZ(1.4deg); }
@@ -111,11 +100,8 @@ h1, .admin-title {
 
 .card.closed {
   animation: envelopeSwing 2s ease-in-out infinite;
-  transform-origin: 50% 5%; /* верхний край */
+  transform-origin: 50% 5%;
 }
-
-
-
 
 /* --------------------------------------------------
    ЛИЦЕВАЯ СТОРОНА
@@ -126,19 +112,24 @@ h1, .admin-title {
   padding: 36px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* было center */
+  justify-content: flex-start;
   align-items: center;
   height: 100%;
   text-align: center;
-  padding-top: 50px; /* добавили красивый отступ сверху */
+  padding-top: 50px;
 }
 
-
 .card-front .logo {
-  width: 320px;
+  width: 300px; /* FIX — было 320 */
   height: auto;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
+}
+
+/* FIX — уменьшение большого заголовка */
+.card-front h2 {
+  font-size: 34px;
+  margin: 0;
 }
 
 /* --------------------------------------------------
@@ -146,14 +137,11 @@ h1, .admin-title {
 ----------------------------------------------------- */
 .card-inner {
   background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%);
-  padding: 0; /* <--- убрали */
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-
 
 /* --------------------------------------------------
    СЕРТИФИКАТ ВНУТРИ
@@ -166,224 +154,57 @@ h1, .admin-title {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
   color: var(--inside-text);
   font-family: 'Becker', serif;
-}
-
-.cert-title {
-  font-size: 40px;
-  margin: 0 0 10px 0;
-  font-weight: 600;
-  color: #5a4a2f;
-}
-
-.cert-sub {
-  margin: 0 0 40px 0;
-  font-size: 28px;
-  opacity: 0.7;
-  color: #5a4a2f;
-}
-
-.cert-field {
-  width: 100%;
-  margin-bottom: 30px;
-}
-
-.cert-field label {
-  display: block;
-  font-size: 28px;
-  color: rgba(0,0,0,0.55);
-  margin-bottom: 4px;
-}
-
-.cert-field p {
-  font-size: 18px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0,0,0,0.25);
-  width: 100%;
-  margin: 0;
-  color: #4a3b26;
-}
-
-.cert-btn {
-  margin-top: 40px;
-  background: var(--envelope-gold);
-  border: none;
-  padding: 12px 22px;
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}.cert-row {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: baseline;
-  margin-bottom: 25px;
-  border-bottom: 1px solid rgba(0,0,0,0.25);
-  padding-bottom: 6px;
-}
-
-.cert-row .label {
-  font-weight: 700;                 /* плотный, выделенный текст */
-  color: #4a3b26;                   /* выразительный тёмно-коричневый */
-  font-size: 20px;
-  margin-right: 12px;
-  white-space: nowrap;              /* НЕ переносится */
-}
-
-.cert-row .value {
-  font-family: 'Becker', serif;
-  font-size: 28px;    /* было 20px */
-  line-height: 1.35;
-}
-
-
-
-
-
-.certificate h2 {
-  font-size: 28px;
-  margin: 6px 0;
-}
-
-.certificate .big {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 12px 0;
-}
-
-.certificate p {
-  margin: 6px 0;
-  color: var(--muted);
-}
-
-/* --------------------------------------------------
-   КНОПКИ
------------------------------------------------------ */
-button {
-  background: var(--envelope-gold);
-  border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #fff;
-  font-weight: 600;
-  margin: 4px;
-  transition: transform .2s;
-}
-
-button:hover {
-  transform: scale(1.05);
 }
 
 /* --------------------------------------------------
    MOBILE
 ----------------------------------------------------- */
-/* ---------- MOBILE FIXES ---------- */
-/* ============================================================
-   АДАПТИВ — ВАРИАНТ B (воздушный, красивый, без поломок)
-   ============================================================ */
 
-/* --- Планшеты и большие телефоны --- */
+/* Планшеты */
 @media (max-width: 900px) {
-
   .card {
     width: 100%;
-    height: auto;
-  }
-
-  .certificate {
-    padding: 40px 36px;
-  }
-
-  .cert-title {
-    font-size: 32px;
-  }
-
-  .cert-row .label {
-    font-size: 18px;
-  }
-
-  .cert-row .value {
-    font-size: 26px;
-  }
-
-  .cert-btn {
-    width: 100%;
-    font-size: 18px;
-    padding: 14px;
+    height: auto; /* FIX */
   }
 
   .card-front .logo {
-    width: 160px;
+    width: 180px;
   }
+
+  .card-front h2 { font-size: 30px; }
 }
 
-/* --- Обычные телефоны --- */
+/* Телефоны */
 @media (max-width: 600px) {
 
-  .certificate {
-    padding: 30px 26px;
-  }
+  #card-wrap { padding: 0 10px; }  /* FIX */
 
-  .cert-title {
-    font-size: 26px;
-  }
-
-  .cert-row {
-    margin-bottom: 18px;
-    padding-bottom: 5px;
-  }
-
-  .cert-row .label {
-    font-size: 16px;
-  }
-
-  .cert-row .value {
-    font-size: 22px;
-  }
-
-  .cert-btn {
-    font-size: 17px;
-    padding: 12px;
+  .card {
+    border-radius: 20px;
+    width: 100%;
   }
 
   .card-front .logo {
-    width: 140px;
+    width: 150px;
   }
+
+  .card-front h2 { font-size: 26px; } /* FIX */
 }
 
-/* --- Маленькие телефоны (iPhone SE) --- */
+/* Маленькие телефоны */
 @media (max-width: 420px) {
 
-  .certificate {
-    padding: 24px 20px;
-  }
-
-  .cert-title {
-    font-size: 22px;
-  }
-
-  .cert-row .label {
-    font-size: 14px;
-  }
-
-  .cert-row .value {
-    font-size: 20px;
-  }
-
-  .cert-btn {
-    font-size: 16px;
-    padding: 12px;
-  }
+  #card-wrap { padding: 0 8px; } /* FIX */
 
   .card-front .logo {
     width: 120px;
   }
+
+  .card-front h2 { font-size: 22px; } /* FIX */
 }
+
 
 
 /**********************************************
