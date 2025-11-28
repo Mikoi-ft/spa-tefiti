@@ -13,15 +13,12 @@
   src: url('/Becker.ttf') format('truetype');
   font-display: swap;
 }
-body {
-  font-family: 'Becker', sans-serif;
-  font-size: 28px;
-}
+body { font-family: 'Becker', sans-serif; font-size: 28px; }
 
-/* Кнопка под конвертом */
+/* ВНЕШНЯЯ кнопка под конвертом */
 #downloadPdfExternal {
   display: none;
-  margin-top: 30px;
+  margin: 30px auto 0 auto; /* центрирование */
   padding: 14px 24px;
   background: #E39E3A;
   color: white;
@@ -34,44 +31,45 @@ body {
 }
 #downloadPdfExternal:hover { transform: scale(1.05); }
 </style>
-
 </head>
 
 <body class="page">
 
-<canvas id="confetti-canvas" style="position:fixed;left:0;top:0;pointer-events:none;z-index:9999;"></canvas>
+<canvas id="confetti-canvas"
+  style="position:fixed;left:0;top:0;pointer-events:none;z-index:9999;">
+</canvas>
 
 <main class="container center">
 
   <div id="card-wrap">
     <div class="card closed">
-      
+
       <!-- Лицевая сторона -->
       <div class="card-front">
         <img src="/logo.svg" alt="Tefiti SPA" class="logo">
-        <h2 style="margin:0;">Подарочный сертификат</h2>
-        <p class="small" style="margin:0;">Кликни, чтобы открыть</p>
+        <h2 class="front-title">Подарочный сертификат</h2>
+        <p class="small">Кликни, чтобы открыть</p>
       </div>
 
       <!-- Внутри -->
       <div class="card-inner" style="display:none;">
         <div class="certificate">
 
-          <h2 class="cert-title" style="padding-bottom:10px;">ПОДАРОЧНЫЙ СЕРТИФИКАТ</h2>
+          <h2 class="cert-title">ПОДАРОЧНЫЙ СЕРТИФИКАТ</h2>
 
           <div class="cert-row">
             <span class="label">Кому:</span>
-            <span class="value" id="full_name">—</span>
+            <span class="value" id="full_name"></span>
           </div>
 
           <div class="cert-row">
             <span class="label">На услугу / программу:</span>
-            <span class="value" id="program">—</span>
+            <span class="value" id="program"></span>
           </div>
 
           <div class="cert-row">
             <span class="label">Действителен до:</span>
-            <span class="value" id="date">—</span>
+            <span class="value" id="date"></span>
           </div>
 
           <div class="cert-row">
@@ -85,7 +83,7 @@ body {
     </div>
   </div>
 
-  <!-- ВНЕШНЯЯ КНОПКА СКАЧАТЬ PDF -->
+  <!-- КНОПКА PDF -->
   <button id="downloadPdfExternal">Скачать PDF</button>
 
   <p id="loading">Загрузка сертификата...</p>
@@ -97,17 +95,18 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-const params = new URLSearchParams(location.search)
-const id = params.get('id')
+const id = new URLSearchParams(location.search).get('id')
 
 const loading = document.getElementById('loading')
 const card = document.querySelector('.card')
 const front = document.querySelector('.card-front')
 const inner = document.querySelector('.card-inner')
+
 const fullNameEl = document.getElementById('full_name')
 const programEl = document.getElementById('program')
 const dateEl = document.getElementById('date')
 const codeEl = document.getElementById('code')
+
 const externalPdfBtn = document.getElementById('downloadPdfExternal')
 
 if (!id) {
@@ -128,36 +127,29 @@ if (!id) {
     loading.style.display = 'none'
 
     fullNameEl.textContent = data.full_name
-    programEl.textContent = data.program || ''
+    programEl.textContent = data.program
     dateEl.textContent = data.date ? new Date(data.date).toLocaleDateString() : ''
     codeEl.textContent = data.code
 
-    front.addEventListener('click', openCard)
+    front.onclick = openCard
 
     function openCard() {
       card.classList.remove('closed')
       inner.style.display = 'block'
       front.style.display = 'none'
-
-      externalPdfBtn.style.display = 'inline-block'
-
+      externalPdfBtn.style.display = 'block'
       startCelebration()
     }
 
     externalPdfBtn.onclick = async () => {
       const el = document.querySelector('.certificate')
-
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
       await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
 
-      const canvas = await html2canvas(el, {
-        scale: 3,           // УЛУЧШЕНОЕ КАЧЕСТВО
-        useCORS: true
-      })
-
+      const canvas = await html2canvas(el, { scale: 3 })
       const img = canvas.toDataURL('image/png', 1.0)
-      const { jsPDF } = window.jspdf
 
+      const { jsPDF } = window.jspdf
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'px',
@@ -171,31 +163,25 @@ if (!id) {
 }
 
 function loadScript(src) {
-  return new Promise((resolve, reject) => {
+  return new Promise((res, rej) => {
     const s = document.createElement('script')
     s.src = src
-    s.onload = resolve
-    s.onerror = reject
+    s.onload = res
+    s.onerror = rej
     document.head.appendChild(s)
   })
 }
 
 async function startCelebration() {
   await loadScript('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js')
-
   const canvas = document.getElementById('confetti-canvas')
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
   const blast = confetti.create(canvas, { resize: true, useWorker: true })
 
-  // Первый основной залп
   blast({ particleCount: 140, spread: 150, origin: { y: 0.6 } })
-
-  // Дополнительные мягкие всплески
   setTimeout(() => blast({ particleCount: 90, spread: 120 }), 500)
   setTimeout(() => blast({ particleCount: 70, spread: 160 }), 900)
-  setTimeout(() => blast({ particleCount: 100, spread: 140, origin: { x: 0.2 } }), 1200)
-  setTimeout(() => blast({ particleCount: 100, spread: 140, origin: { x: 0.8 } }), 1400)
 }
 </script>
 

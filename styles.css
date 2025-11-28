@@ -1,154 +1,133 @@
+/* --- Глобальные переменные --- */
 :root {
   --bg: #1a3a2c;
   --envelope-dark: #0b2a1e;
   --envelope-gold: #bb9d58;
   --inside-bg: #f6f2ec;
   --inside-text: #5a4a2f;
-  --card: #fff;
   --muted: #6e5a37;
-
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* --------------------------------------------------
-   ГЛОБАЛЬНЫЕ СТИЛИ ДЛЯ СТРАНИЦЫ (кроме admin-page)
------------------------------------------------------ */
+/* --- Основной фон страницы сертификата --- */
 body.page {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   flex-direction: column;
-  background: var(--bg);
+  min-height: 100vh;
   margin: 0;
-  color: var(--envelope-gold);
-}
-
-h1, .admin-title {
-  text-align: center;
-  width: 100%;
+  background: var(--bg);
 }
 
 /* --------------------------------------------------
-   СТИЛИ КОНВЕРТА
------------------------------------------------------ */
+   КОНТЕЙНЕР КОНВЕРТА
+-------------------------------------------------- */
 
 #card-wrap {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 12px; /* защита от касания краёв */
+  padding: 0 16px; /* FIX — защита от краёв */
   box-sizing: border-box;
 }
 
 .card {
-  border-radius: 22px;
-  border: 4px solid rgba(255,255,255,0.08);
   width: min(820px, 100%);
   height: 460px;
+  border-radius: 22px;
   overflow: hidden;
+  cursor: pointer;
+  border: 4px solid rgba(255,255,255,0.08);
   box-shadow:
     0 30px 60px rgba(0,0,0,0.7),
     0 80px 160px rgba(0,0,0,0.45);
-  transition: transform .6s;
-  cursor: pointer;
   transform-style: preserve-3d;
+  transition: 0.5s;
 }
 
-/* Анимация конверта */
-@keyframes envelopeSwing {
-  0%   { transform: rotateZ(0deg); }
-  20%  { transform: rotateZ(1.4deg); }
-  40%  { transform: rotateZ(-1.4deg); }
-  60%  { transform: rotateZ(1deg); }
-  80%  { transform: rotateZ(-1deg); }
-  100% { transform: rotateZ(0deg); }
-}
-
+/* Анимация */
 .card.closed {
   animation: envelopeSwing 2s ease-in-out infinite;
   transform-origin: 50% 5%;
 }
 
+@keyframes envelopeSwing {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  50% { transform: rotate(-2deg); }
+  100% { transform: rotate(0deg); }
+}
+
 /* --------------------------------------------------
    ЛИЦЕВАЯ СТОРОНА
------------------------------------------------------ */
+-------------------------------------------------- */
 
 .card-front {
   background: linear-gradient(120deg, var(--envelope-dark), #123822);
+  padding: 50px 20px;
+  text-align: center;
   color: var(--envelope-gold);
-  padding: 36px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
-  height: 100%;
-  text-align: center;
-  padding-top: 50px;
+  justify-content: flex-start;
 }
 
 .card-front .logo {
-  width: 300px;
+  width: 260px;
   margin-bottom: 14px;
-  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.35));
 }
 
 .card-front h2 {
   font-size: 34px;
-  margin: 0;
 }
 
 /* --------------------------------------------------
    ВНУТРЕННЯЯ СТОРОНА
------------------------------------------------------ */
+-------------------------------------------------- */
 
 .card-inner {
-  background: linear-gradient(180deg, #f3e8d3 0%, #efe1c7 100%);
-  height: 100%;
+  background: linear-gradient(180deg,#f3e8d3,#efe1c7);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
+
+/* --------------------------------------------------
+   СЕРТИФИКАТ
+-------------------------------------------------- */
 
 .certificate {
+  padding: 50px 60px;
   width: 100%;
-  height: 100%;
-  padding: 60px 80px;
-  background: linear-gradient(180deg, #f2e7d3, #ecddc2);
+  height: auto;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  color: var(--inside-text);
-  font-family: 'Becker', serif;
+  background: linear-gradient(180deg,#f2e7d3,#ecddc2);
 }
 
-/* Заголовок внутри */
 .cert-title {
-  font-family: 'Onest', sans-serif !important;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-family: 'Onest', sans-serif;
+  font-size: 38px;
+  margin: 0 0 15px 0;
   color: #4a3b26;
-  font-size: 40px;
-  margin: 0 0 12px 0;
 }
 
-/* Поля */
+/* Строки */
 .cert-row {
   width: 100%;
   display: flex;
-  justify-content: flex-start;
-  align-items: baseline;
-  margin-bottom: 25px;
+  gap: 10px;
+  flex-wrap: wrap; /* MAIN FIX: длинные строки теперь переносятся */
   border-bottom: 1px solid rgba(0,0,0,0.25);
   padding-bottom: 6px;
+  margin-bottom: 22px;
 }
 
 .cert-row .label {
   font-family: "Onest", sans-serif;
   font-weight: 700;
-  color: #4a3b26;
   font-size: 18px;
-  margin-right: 12px;
+  color: #4a3b26;
   white-space: nowrap;
 }
 
@@ -156,57 +135,40 @@ h1, .admin-title {
   font-family: 'Becker', serif;
   font-size: 26px;
   line-height: 1.35;
+  word-break: break-word; /* FIX длинных слов */
 }
 
 /* --------------------------------------------------
-   АДАПТИВ КОНВЕРТА
------------------------------------------------------ */
+   АДАПТИВНЫЕ ИСПРАВЛЕНИЯ
+-------------------------------------------------- */
 
-/* Планшеты */
 @media (max-width: 900px) {
   .card { height: auto; }
   .card-front .logo { width: 200px; }
   .card-front h2 { font-size: 30px; }
-
-  .certificate { padding: 40px 36px; }
+  .certificate { padding: 40px 30px; }
 }
 
-/* Телефоны */
 @media (max-width: 600px) {
-
   #card-wrap { padding: 0 10px; }
 
   .card-front .logo { width: 150px; }
   .card-front h2 { font-size: 26px; }
 
-  .certificate {
-    padding: 30px 26px !important;
-  }
-
-  .cert-title {
-    font-size: 28px;
-  }
-
+  .certificate { padding: 26px 20px; }
+  .cert-title { font-size: 28px; }
   .cert-row .label { font-size: 16px; }
   .cert-row .value { font-size: 22px; }
 }
 
-/* Маленькие телефоны */
 @media (max-width: 420px) {
-
   #card-wrap { padding: 0 8px; }
-
   .card-front .logo { width: 120px; }
   .card-front h2 { font-size: 22px; }
-
-  .certificate {
-    padding: 22px 14px !important;
-  }
-
-  .cert-title { font-size: 22px; }
-  .cert-row .label { font-size: 14px; }
-  .cert-row .value { font-size: 20px; }
+  .certificate { padding: 20px 16px; }
+  .cert-title { font-size: 24px; }
 }
+
 
 /* --------------------------------------------------
    АДМИН-ПАНЕЛЬ
