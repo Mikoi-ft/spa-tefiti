@@ -63,7 +63,7 @@ body.page {
 -------------------------------------------------- */
 
 .card-front {
-  background: linear-gradient(120deg, var(--envelope-dark), #123822);
+  background: linear-gradient(180deg, var(--envelope-dark), #123822);
   padding: 50px 20px;
   text-align: center;
   color: var(--envelope-gold);
