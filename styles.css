@@ -25,13 +25,14 @@ body {
 ============================================================ */
 body.page.certificate-page {
   display: flex;
-  justify-content: center;     /* центр по вертикали */
-  align-items: center;         /* центр по горизонтали */
   flex-direction: column;
+  justify-content: center;      /* Центрируем вертикально */
+  align-items: center;          /* Центрируем горизонтально */
   min-height: 100vh;
   margin: 0;
-  padding: 0;                  /* УБИРАЕМ отступ сверху */
+  padding: 0;                   /* ВАЖНО: никаких отступов */
   background: var(--bg);
+  box-sizing: border-box;
 }
 
 /* Контейнер */
@@ -40,6 +41,10 @@ body.page.certificate-page {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;    /* ВАЖНО */
+  margin: 0;                  /* УБИРАЕМ ЛЮБОЙ МАРДЖИН */
+  padding: 0;                 /* УБИРАЕМ ОТСТУПЫ */
+  box-sizing: border-box;
 }
 
 /* --------- Карточка / конверт --------- */
@@ -47,15 +52,17 @@ body.page.certificate-page {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 0 16px;
+  align-items: center;     /* ВАЖНО: ставим центр */
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
-  margin-bottom: 24px;
 }
+
 
 .card {
   width: 100%;
   max-width: 820px;
-  aspect-ratio: 820/460;
+  height: auto; 
   border-radius: 22px;
   overflow: hidden;
   cursor: pointer;
