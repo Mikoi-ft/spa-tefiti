@@ -35,6 +35,11 @@ body.page.certificate-page {
   box-sizing: border-box;
 }
 
+.cert-title {
+  font-family: 'Becker', serif !important;
+}
+
+
 /* Контейнер */
 .container.center {
   width: 100%;
