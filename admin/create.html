@@ -178,9 +178,13 @@ createForm.onsubmit = async (e) => {
 
 // копирование ссылки после создания
 copyLinkBtn.onclick = () => {
-  navigator.clipboard.writeText(shareLink.value)
+  const text = `Ваш подарочный сертификат доступен по ссылке: ${shareLink.value}`;
+
+  navigator.clipboard.writeText(text)
     .then(() => alert("Ссылка скопирована!"))
+    .catch(() => alert("Ошибка копирования"));
 }
+
 
 
 /* ------------ Проверка сертификата ----------------- */
