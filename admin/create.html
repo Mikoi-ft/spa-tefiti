@@ -212,20 +212,41 @@ checkBtn.onclick = async () => {
 
   checkResult.innerHTML = `
     <p style="color:green">✔ Сертификат найден</p>
+
     <p><b>ФИО:</b> ${data.full_name}</p>
     <p><b>Программа:</b> ${data.program || '-'}</p>
-    <p><b>Дата:</b> ${data.date || '-'}</p>
+    <p><b>Дата действия:</b> ${data.date || '-'}</p>
     <p><b>Создан:</b> ${new Date(data.created_at).toLocaleString()}</p>
 
-    <p>Ссылка:
-      <input value="${link}" readonly style="width:100%" />
-      <button class="checkCopyLinkBtn">Скопировать ссылку</button>
+    <p><b>Статус:</b>
+      ${data.used 
+        ? "<span style='color:red'>Использован</span>" 
+        : "<span style='color:green'>Не использован</span>"
+      }
+    </p>
+
+    ${data.used_at 
+      ? `<p><b>Дата использования:</b> ${new Date(data.used_at).toLocaleString()}</p>` 
+      : ""
+    }
+
+    ${
+      data.used 
+        ? "" 
+        : `<button id="markUsedBtn" style="margin-top:10px;">Отметить как использованный</button>`
+    }
+
+    <p style="margin-top:20px;">
+      Ссылка на сертификат:<br>
+      <input id="checkShareLink" value="${link}" readonly style="width:100%; margin-top:6px;" />
+      <button id="checkCopyLinkBtn" style="margin-top:10px;">Скопировать ссылку</button>
     </p>
   `
 
-  // правильное подключение кнопки копирования
-  const copyBtn = checkResult.querySelector(".checkCopyLinkBtn")
-
+  /* ----------------------------
+     КНОПКА КОПИРОВАНИЯ ССЫЛКИ
+  ----------------------------- */
+  const copyBtn = document.getElementById("checkCopyLinkBtn")
   if (copyBtn) {
     copyBtn.onclick = () => {
       const text = `Ваш подарочный сертификат доступен по ссылке ${link}`
@@ -233,8 +254,34 @@ checkBtn.onclick = async () => {
         .then(() => alert("Ссылка скопирована!"))
     }
   }
-}
 
+  /* -----------------------------------------
+     КНОПКА "ОТМЕТИТЬ КАК ИСПОЛЬЗОВАННЫЙ"
+  ------------------------------------------ */
+  const markUsedBtn = document.getElementById("markUsedBtn")
+
+  if (markUsedBtn) {
+    markUsedBtn.onclick = async () => {
+      if (!confirm("Отметить сертификат как использованный?")) return;
+
+      const { error: updateError } = await supabase
+        .from("certificates")
+        .update({
+          used: true,
+          used_at: new Date().toISOString()
+        })
+        .eq("id", data.id)
+
+      if (updateError) {
+        alert("Ошибка при обновлении: " + updateError.message)
+        return
+      }
+
+      alert("Сертификат отмечен как использованный!")
+      checkBtn.click()   // перезагрузить данные проверки
+    }
+  }
+}
 </script>
 
 </body>
