@@ -25,12 +25,13 @@ body {
 ============================================================ */
 body.page.certificate-page {
   display: flex;
+  justify-content: center;     /* центр по вертикали */
+  align-items: center;         /* центр по горизонтали */
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  padding-top: 20px;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 0;                  /* УБИРАЕМ отступ сверху */
+  background: var(--bg);
 }
 
 /* Контейнер */
@@ -295,4 +296,13 @@ body.admin-page {
   }
   .admin-page #login-area input { width: 65% !important; }
   .admin-page #login-area button { width: 35%; }
+}
+
+/* Отступ между полем и кнопкой проверки */
+.admin-page #check-area input {
+  margin-bottom: 12px;     /* поле → кнопка */
+}
+
+.admin-page #check-area button {
+  margin-top: 6px;         /* запас сверху */
 }
