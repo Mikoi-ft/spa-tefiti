@@ -15,10 +15,10 @@
 }
 body { font-family: 'Becker', sans-serif; font-size: 28px; }
 
-/* ВНЕШНЯЯ кнопка под конвертом */
+/* ВНЕШНЯЯ кнопка */
 #downloadPdfExternal {
   display: none;
-  margin: 30px auto 0 auto; /* центрирование */
+  margin: 30px auto 0 auto;
   padding: 14px 24px;
   background: #E39E3A;
   color: white;
@@ -30,6 +30,15 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
   transition: 0.25s;
 }
 #downloadPdfExternal:hover { transform: scale(1.05); }
+
+/* МЕЛКИЙ ТЕКСТ */
+.small-notes {
+  font-size: 10px;
+  margin-top: 20px;
+  line-height: 1.4;
+  opacity: 0.85;
+  text-align: left;
+}
 </style>
 </head>
 
@@ -44,11 +53,10 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
   <div id="card-wrap">
     <div class="card closed">
 
-      <!-- Лицевая сторона -->
+      <!-- Лицевая -->
       <div class="card-front">
         <img src="/logo.svg" alt="Tefiti SPA" class="logo">
         <h2 class="front-title">Подарочный сертификат</h2>
-
       </div>
 
       <!-- Внутри -->
@@ -77,17 +85,25 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
             <span class="value" id="code"></span>
           </div>
 
+          <!-- ★ Новый маленький текст ★ -->
+          <div class="small-notes">
+            *Сертификат действует по предварительной записи +996755181514<br>
+            *Сертификат не подлежит возврату и обмену на денежное средство<br>
+            *Если стоимость процедуры меньше стоимости услуги остаток можно использовать в счет следующей процедуры.
+          </div>
+
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- КНОПКА PDF -->
+  <!-- Кнопка PDF -->
   <button id="downloadPdfExternal">Скачать PDF</button>
 
   <p id="loading">Загрузка сертификата...</p>
 </main>
+
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -135,7 +151,7 @@ if (!id) {
 
     function openCard() {
       card.classList.remove('closed')
-      card.classList.add('opened') 
+      card.classList.add('opened')
       inner.style.display = 'block'
       front.style.display = 'none'
       externalPdfBtn.style.display = 'block'
