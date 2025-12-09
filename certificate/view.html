@@ -104,6 +104,9 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
   <p id="loading">Загрузка сертификата...</p>
 </main>
 
+<!-- Невидимый аудиоплеер: никаких контролов и ничего видимого -->
+<!-- НЕ меняет внешний вид страницы -->
+<audio id="bg-audio" src="/music.mp3" preload="auto" playsinline aria-hidden="true"></audio>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.2?bundle";
@@ -200,6 +203,59 @@ async function startCelebration() {
   setTimeout(() => blast({ particleCount: 90, spread: 120 }), 500)
   setTimeout(() => blast({ particleCount: 70, spread: 160 }), 900)
 }
+
+/* ===========================
+   Код для фоновой музыки
+   =========================== */
+
+(function initBackgroundAudio() {
+  // используем <audio id="bg-audio"> из разметки
+  const audio = document.getElementById('bg-audio');
+
+  // настройки: без видимых контролов, загружать заранее
+  audio.preload = 'auto';
+  audio.loop = false; // если нужен повтор — поставь true
+  // по умолчанию громкость 1.0 (максимум). при необходимости изменить:
+  audio.volume = 1.0;
+  // playsinline для мобильных браузеров
+  audio.playsInline = true;
+
+  // Попытка проиграть сразу
+  const tryPlay = () => {
+    // некоторые браузеры возвращают промис
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // успешно запустилось
+        removeInteractionListeners();
+      }).catch(() => {
+        // блокировано — ждём пользовательского взаимодействия
+        // (ничего не показываем и не меняем интерфейс)
+      });
+    }
+  };
+
+  const removeInteractionListeners = () => {
+    window.removeEventListener('click', tryPlay);
+    window.removeEventListener('touchstart', tryPlay);
+    window.removeEventListener('keydown', tryPlay);
+  };
+
+  // Если автоzапуск заблокирован, то начать при первом взаимодействии пользователя.
+  // Ставим once: true, чтобы после первой попытки слушатели удалились.
+  window.addEventListener('click', tryPlay, { once: true, passive: true });
+  window.addEventListener('touchstart', tryPlay, { once: true, passive: true });
+  window.addEventListener('keydown', tryPlay, { once: true, passive: true });
+
+  // Немедленная попытка
+  tryPlay();
+
+  // На случай, если аудио загружается дольше — можно подстраховаться событием canplaythrough
+  audio.addEventListener('canplaythrough', () => {
+    // если ещё не запущено, попробуем снова
+    tryPlay();
+  }, { once: true });
+})();
 </script>
 
 </body>
