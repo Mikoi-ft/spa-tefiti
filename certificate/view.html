@@ -15,7 +15,7 @@
 }
 body { font-family: 'Becker', sans-serif; font-size: 28px; }
 
-/* ВНЕШНЯЯ кнопка */
+/* ВНЕШНЯЯ кнопка (скрыта в этом варианте) */
 #downloadPdfExternal {
   display: none;
   margin: 30px auto 0 auto;
@@ -40,15 +40,20 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
   text-align: left;
 }
 
-/* Карточка (как в прошлом коде) */
+/* Карточка (по вашему исходному стилю) */
 .container.center { display:flex; align-items:center; justify-content:center; min-height:100vh; }
-.card { width:900px; height:600px; border-radius:18px; box-shadow:0 30px 80px rgba(0,0,0,0.25); overflow:hidden; background:white; position:relative; }
-.card-front { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; cursor:pointer; }
-.certificate { padding:40px; }
+.card { width:900px; height:600px; border-radius:18px; box-shadow:0 30px 80px rgba(0,0,0,0.25); overflow:hidden; background:white; position:relative; transition: transform 0.6s ease, height 0.4s; }
+.card.front-hidden { /* reserved if needed */ }
+.card.closed .card-inner { display:none; }
+.card-front { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; cursor:pointer; padding: 40px; box-sizing: border-box; }
+.certificate { padding:40px; box-sizing: border-box; }
 .cert-row { margin:14px 0; display:flex; gap:16px; align-items:center; }
 .label { font-weight:700; width:240px; display:inline-block; }
 .value { font-weight:500; }
 .logo { width:140px; margin-bottom:20px; }
+
+/* Небольшая анимация открытия карточки (если захочется) */
+.card.opened { transform: scale(1.01); }
 </style>
 </head>
 
@@ -107,14 +112,15 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
     </div>
   </div>
 
-  <!-- Кнопка PDF -->
-  <button id="downloadPdfExternal">Скачать PDF</button>
+  <!-- Кнопка PDF (в данном варианте скрыта через CSS) -->
+  <button id="downloadPdfExternal" style="display:none;">Скачать PDF</button>
 
   <p id="loading">Загрузка сертификата...</p>
 </main>
 
-<!-- Скрытое аудио — без контролов -->
-<audio id="bg-music" src="/music/luxury-ambient.mp3" loop preload="auto" style="display:none"></audio>
+<!-- ====== Аудио (скрыто, без контролов) ======
+     Положи свой файл, например, в /music/luxury-ambient.mp3 и укажи путь в AUDIO_SRC ====== -->
+<audio id="bg-music" src="/music/luxury-ambient.mp3" loop preload="auto" crossorigin="anonymous" style="display:none"></audio>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.2?bundle";
@@ -213,27 +219,34 @@ async function startCelebration() {
 }
 
 /* =========================
-   Фоновая музыка: старт до открытия конверта
-   - Скрытый элемент <audio>
-   - Попытка play() с звуком; при блокировке — play() в muted
-   - На любом первом жесте (click/touch/keydown) — unmute + fade-in
+   Фоновая музыка: автозапуск до открытия конверта
+   - Без видимых кнопок
+   - Попытка play() сразу
+   - Если блокируется: запускаем в muted (часто разрешено), ждём первого user gesture и затем плавно unmute + fade-in
+   - Аудио стартует при загрузке страницы (до открытия конверта)
    ========================= */
-(function initBackgroundAudio() {
-  const AUDIO_SRC = '/music.mp3' // <-- поменяй путь, если нужно
-  const TARGET_VOLUME = 0.25
-  const FADE_MS = 1500
+
+(() => {
+  const AUDIO_SRC = '/music.mp3' // <-- путь к вашему файлу
+  const TARGET_VOLUME = 0.25   // желаемая итоговая громкость (0.0 - 1.0)
+  const FADE_DURATION = 1800   // ms для fade-in
   const audio = document.getElementById('bg-music')
+
   if (!audio) return
+
+  // гарантируем источник
   if (!audio.src) audio.src = AUDIO_SRC
+
   audio.loop = true
   audio.preload = 'auto'
   audio.volume = 0.0
-  audio.muted = false
+  audio.muted = false // попробуем сначала без muted
 
-  function fadeTo(target, ms) {
+  function fadeTo(target = TARGET_VOLUME, duration = FADE_DURATION) {
+    const current = audio.volume
     const steps = 30
-    const stepTime = ms / steps
-    const delta = (target - audio.volume) / steps
+    const stepTime = duration / steps
+    const delta = (target - current) / steps
     let i = 0
     const t = setInterval(() => {
       i++
@@ -242,55 +255,63 @@ async function startCelebration() {
     }, stepTime)
   }
 
-  async function tryUnmuteAndFade() {
+  function onStarted(unmuted = true) {
+    if (unmuted) {
+      fadeTo(TARGET_VOLUME)
+    } else {
+      audio.volume = 0.0
+    }
+    window.removeEventListener('click', onFirstGesture)
+    window.removeEventListener('touchstart', onFirstGesture)
+    window.removeEventListener('keydown', onFirstGesture)
+  }
+
+  async function onFirstGesture() {
     try {
       audio.muted = false
       await audio.play()
-      fadeTo(TARGET_VOLUME, FADE_MS)
-      removeGestureListeners()
+      fadeTo(TARGET_VOLUME)
     } catch (e) {
-      // ignore
+      console.warn('Не удалось unmute background audio on gesture:', e)
     }
+    window.removeEventListener('click', onFirstGesture)
+    window.removeEventListener('touchstart', onFirstGesture)
+    window.removeEventListener('keydown', onFirstGesture)
   }
 
-  function onUserGestureOnce() {
-    tryUnmuteAndFade()
-  }
-
-  function addGestureListeners() {
-    window.addEventListener('click', onUserGestureOnce, { once: true, passive: true })
-    window.addEventListener('touchstart', onUserGestureOnce, { once: true, passive: true })
-    window.addEventListener('keydown', onUserGestureOnce, { once: true, passive: true })
-  }
-
-  function removeGestureListeners() {
-    window.removeEventListener('click', onUserGestureOnce)
-    window.removeEventListener('touchstart', onUserGestureOnce)
-    window.removeEventListener('keydown', onUserGestureOnce)
-  }
-
-  // Попытка 1: play() без muted
+  // Попытка 1: play сразу (без muted)
   audio.play().then(() => {
-    // стартовал с воспроизведением (браузер разрешил) — плавно доводим громкость до TARGET
-    fadeTo(TARGET_VOLUME, FADE_MS)
+    onStarted(true)
   }).catch(async (err) => {
-    // Браузер запретил автоплей со звуком: попробуем play в muted (это часто разрешено)
+    // Если автоплей с звуком блокируется, пробуем запустить в muted режиме
     try {
       audio.muted = true
       await audio.play()
-      // аудио играет, но muted — ждём жест для unmute+fade
-      addGestureListeners()
-    } catch (err2) {
-      // Даже muted заблокирован — ждём жест и тогда попытаемся play+unmute
-      addGestureListeners()
+      onStarted(false)
+      window.addEventListener('click', onFirstGesture, { once: true })
+      window.addEventListener('touchstart', onFirstGesture, { once: true })
+      window.addEventListener('keydown', onFirstGesture, { once: true })
+    } catch (e2) {
+      // Если и muted автоплей заблокирован, подпишемся на жест и тогда play+unmute
+      window.addEventListener('click', async function handler() {
+        try {
+          audio.muted = false
+          await audio.play()
+          fadeTo(TARGET_VOLUME)
+        } catch (e3) {
+          console.warn('Не удалось запустить аудио после жеста:', e3)
+        }
+        window.removeEventListener('click', handler)
+      }, { once: true })
     }
   })
 
-  // при выгрузке страницы — стоп
+  // Сбрасываем при закрытии страницы
   window.addEventListener('beforeunload', () => {
     try { audio.pause(); audio.currentTime = 0 } catch (e) {}
   })
 })();
+
 </script>
 
 </body>
