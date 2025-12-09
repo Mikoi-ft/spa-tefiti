@@ -13,7 +13,7 @@
   src: url('/Becker.ttf') format('truetype');
   font-display: swap;
 }
-body { font-family: 'Becker', sans-serif; font-size: 28px; }
+body { font-family: 'Becker', sans-serif; font-size: 28px; margin:0; }
 
 /* ВНЕШНЯЯ кнопка */
 #downloadPdfExternal {
@@ -49,6 +49,24 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
 .label { font-weight:700; width:240px; display:inline-block; }
 .value { font-weight:500; }
 .logo { width:140px; margin-bottom:20px; }
+
+/* Минимальный overlay-приглашение (скроется после жеста) */
+#sound-hint {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 18px;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  backdrop-filter: blur(4px);
+  z-index: 20000;
+  pointer-events: auto;
+  transition: opacity 220ms ease;
+}
+#sound-hint.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(6px); }
 </style>
 </head>
 
@@ -116,6 +134,9 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; }
 <!-- Скрытое аудио — без контролов -->
 <audio id="bg-music" src="/music.mp3" loop preload="auto" style="display:none"></audio>
 
+<!-- Минимальный hint для включения звука, только если браузер блокирует автоплей -->
+<div id="sound-hint" aria-hidden="true">Нажмите где угодно, чтобы включить звук</div>
+
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.2?bundle";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/config.js'
@@ -135,6 +156,7 @@ const dateEl = document.getElementById('date')
 const codeEl = document.getElementById('code')
 
 const externalPdfBtn = document.getElementById('downloadPdfExternal')
+const soundHint = document.getElementById('sound-hint')
 
 if (!id) {
   loading.textContent = 'Некорректная ссылка (нет id)'
@@ -214,9 +236,9 @@ async function startCelebration() {
 
 /* =========================
    Фоновая музыка: старт до открытия конверта
-   - Скрытый элемент <audio>
-   - Попытка play() с звуком; при блокировке — play() в muted
-   - На любом первом жесте (click/touch/keydown) — unmute + fade-in
+   - Пытаемся play() с звуком сразу
+   - Если блокируется — play() в muted, показываем маленький hint
+   - После любого клика/тапа/keydown — unmute + плавный fade-in и скрываем hint
    ========================= */
 (function initBackgroundAudio() {
   const AUDIO_SRC = '/music.mp3' // <-- поменяй путь, если нужно
@@ -232,7 +254,7 @@ async function startCelebration() {
 
   function fadeTo(target, ms) {
     const steps = 30
-    const stepTime = ms / steps
+    const stepTime = Math.max(10, ms / steps)
     const delta = (target - audio.volume) / steps
     let i = 0
     const t = setInterval(() => {
@@ -242,46 +264,60 @@ async function startCelebration() {
     }, stepTime)
   }
 
-  async function tryUnmuteAndFade() {
+  function showHint() {
+    if (!soundHint) return
+    soundHint.classList.remove('hidden')
+  }
+  function hideHint() {
+    if (!soundHint) return
+    soundHint.classList.add('hidden')
+  }
+
+  async function unmuteAndFade() {
     try {
       audio.muted = false
-      await audio.play()
+      // Иногда браузеры требуют повторного вызова play на событие — делаем play() здесь
+      await audio.play().catch(()=>{})
       fadeTo(TARGET_VOLUME, FADE_MS)
-      removeGestureListeners()
     } catch (e) {
-      // ignore
+      console.warn('unmute failed', e)
+    } finally {
+      hideHint()
+      removeGestureListeners()
     }
   }
 
-  function onUserGestureOnce() {
-    tryUnmuteAndFade()
+  function onUserGesture() {
+    unmuteAndFade()
   }
 
   function addGestureListeners() {
-    window.addEventListener('click', onUserGestureOnce, { once: true, passive: true })
-    window.addEventListener('touchstart', onUserGestureOnce, { once: true, passive: true })
-    window.addEventListener('keydown', onUserGestureOnce, { once: true, passive: true })
+    window.addEventListener('click', onUserGesture, { once: true, passive: true })
+    window.addEventListener('touchstart', onUserGesture, { once: true, passive: true })
+    window.addEventListener('keydown', onUserGesture, { once: true, passive: true })
   }
-
   function removeGestureListeners() {
-    window.removeEventListener('click', onUserGestureOnce)
-    window.removeEventListener('touchstart', onUserGestureOnce)
-    window.removeEventListener('keydown', onUserGestureOnce)
+    window.removeEventListener('click', onUserGesture)
+    window.removeEventListener('touchstart', onUserGesture)
+    window.removeEventListener('keydown', onUserGesture)
   }
 
   // Попытка 1: play() без muted
   audio.play().then(() => {
-    // стартовал с воспроизведением (браузер разрешил) — плавно доводим громкость до TARGET
+    // Если стартовал — плавно доводим громкость
     fadeTo(TARGET_VOLUME, FADE_MS)
+    hideHint()
   }).catch(async (err) => {
-    // Браузер запретил автоплей со звуком: попробуем play в muted (это часто разрешено)
+    // Если автоплей со звуком заблокирован — пробуем play() в muted (часто разрешено)
     try {
       audio.muted = true
       await audio.play()
-      // аудио играет, но muted — ждём жест для unmute+fade
+      // аудио играет в muted — показываем небольшой hint, ждём жест
+      showHint()
       addGestureListeners()
     } catch (err2) {
-      // Даже muted заблокирован — ждём жест и тогда попытаемся play+unmute
+      // Если и muted заблокирован — всё равно показываем hint, ждём жест и тогда попытаемся play+unmute
+      showHint()
       addGestureListeners()
     }
   })
