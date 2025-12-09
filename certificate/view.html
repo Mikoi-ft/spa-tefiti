@@ -13,7 +13,8 @@
   src: url('/Becker.ttf') format('truetype');
   font-display: swap;
 }
-body { font-family: 'Becker', sans-serif; font-size: 28px; margin:0; }
+/* Важно: убираем дефолтные отступы, чтобы центровка была точной */
+body { font-family: 'Becker', sans-serif; font-size: 28px; margin: 0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
 /* ВНЕШНЯЯ кнопка */
 #downloadPdfExternal {
@@ -40,17 +41,54 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; margin:0; }
   text-align: left;
 }
 
-/* Карточка (как в прошлом коде) */
-.container.center { display:flex; align-items:center; justify-content:center; min-height:100vh; }
-.card { width:900px; height:600px; border-radius:18px; box-shadow:0 30px 80px rgba(0,0,0,0.25); overflow:hidden; background:white; position:relative; }
-.card-front { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; cursor:pointer; }
-.certificate { padding:40px; }
+/* Контейнер и карточка — ключевые правки:
+   - добавил вертикальные паддинги у контейнера, чтобы на очень больших экранах
+     карточка не висела слишком далеко от центра
+   - ограничил max-height карточки (чтобы визуально она была меньше сверху/снизу)
+*/
+.container.center {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding: 36px 20px; /* уменьшает видимые пустоты сверху/снизу на широких экранах */
+  box-sizing: border-box;
+}
+
+/* Фиксированная ширина и высота карточки, но с ограничением по высоте окна */
+.card {
+  width: 900px;
+  height: 600px;
+  max-height: calc(100vh - 72px); /* не будет занимать всё окно — оставит ~36px сверху/снизу */
+  border-radius:18px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.25);
+  overflow:hidden;
+  background:white;
+  position:relative;
+  transition: transform 0.35s ease;
+  box-sizing: border-box;
+}
+
+/* если на очень узких экранах уменьшаем карточку */
+@media (max-height: 700px) {
+  .card { height: 520px; max-height: calc(100vh - 48px); }
+}
+@media (max-width: 960px) {
+  .card { width: calc(100% - 48px); height: auto; padding: 24px; }
+}
+
+/* Класс лицевой части и внутри */
+.card-front { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; cursor:pointer; padding: 40px; box-sizing: border-box; }
+.certificate { padding:40px; box-sizing: border-box; }
 .cert-row { margin:14px 0; display:flex; gap:16px; align-items:center; }
 .label { font-weight:700; width:240px; display:inline-block; }
 .value { font-weight:500; }
 .logo { width:140px; margin-bottom:20px; }
 
-/* Минимальный overlay-приглашение (скроется после жеста) */
+/* Небольшая мелочь: гарантируем, что внутренние элементы не меняют высоту карточки */
+.card-inner, .card-front { min-height: 1px; }
+
+/* Hint (опционально) */
 #sound-hint {
   position: fixed;
   left: 50%;
@@ -64,7 +102,7 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; margin:0; }
   backdrop-filter: blur(4px);
   z-index: 20000;
   pointer-events: auto;
-  transition: opacity 220ms ease;
+  transition: opacity 220ms ease, transform 220ms ease;
 }
 #sound-hint.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(6px); }
 </style>
@@ -134,8 +172,6 @@ body { font-family: 'Becker', sans-serif; font-size: 28px; margin:0; }
 <!-- Скрытое аудио — без контролов -->
 <audio id="bg-music" src="/music.mp3" loop preload="auto" style="display:none"></audio>
 
-<!-- Минимальный hint для включения звука, только если браузер блокирует автоплей -->
-<div id="sound-hint" aria-hidden="true">Нажмите где угодно, чтобы включить звук</div>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.86.2?bundle";
@@ -236,9 +272,8 @@ async function startCelebration() {
 
 /* =========================
    Фоновая музыка: старт до открытия конверта
-   - Пытаемся play() с звуком сразу
-   - Если блокируется — play() в muted, показываем маленький hint
-   - После любого клика/тапа/keydown — unmute + плавный fade-in и скрываем hint
+   - Попытка play() с звуком; при блокировке — play() в muted + hint
+   - После любого клика/тапа/keydown — unmute + fade-in
    ========================= */
 (function initBackgroundAudio() {
   const AUDIO_SRC = '/music.mp3' // <-- поменяй путь, если нужно
@@ -264,19 +299,12 @@ async function startCelebration() {
     }, stepTime)
   }
 
-  function showHint() {
-    if (!soundHint) return
-    soundHint.classList.remove('hidden')
-  }
-  function hideHint() {
-    if (!soundHint) return
-    soundHint.classList.add('hidden')
-  }
+  function showHint() { if (soundHint) soundHint.classList.remove('hidden') }
+  function hideHint() { if (soundHint) soundHint.classList.add('hidden') }
 
   async function unmuteAndFade() {
     try {
       audio.muted = false
-      // Иногда браузеры требуют повторного вызова play на событие — делаем play() здесь
       await audio.play().catch(()=>{})
       fadeTo(TARGET_VOLUME, FADE_MS)
     } catch (e) {
@@ -287,10 +315,7 @@ async function startCelebration() {
     }
   }
 
-  function onUserGesture() {
-    unmuteAndFade()
-  }
-
+  function onUserGesture() { unmuteAndFade() }
   function addGestureListeners() {
     window.addEventListener('click', onUserGesture, { once: true, passive: true })
     window.addEventListener('touchstart', onUserGesture, { once: true, passive: true })
@@ -302,27 +327,21 @@ async function startCelebration() {
     window.removeEventListener('keydown', onUserGesture)
   }
 
-  // Попытка 1: play() без muted
   audio.play().then(() => {
-    // Если стартовал — плавно доводим громкость
     fadeTo(TARGET_VOLUME, FADE_MS)
     hideHint()
-  }).catch(async (err) => {
-    // Если автоплей со звуком заблокирован — пробуем play() в muted (часто разрешено)
+  }).catch(async () => {
     try {
       audio.muted = true
       await audio.play()
-      // аудио играет в muted — показываем небольшой hint, ждём жест
       showHint()
       addGestureListeners()
     } catch (err2) {
-      // Если и muted заблокирован — всё равно показываем hint, ждём жест и тогда попытаемся play+unmute
       showHint()
       addGestureListeners()
     }
   })
 
-  // при выгрузке страницы — стоп
   window.addEventListener('beforeunload', () => {
     try { audio.pause(); audio.currentTime = 0 } catch (e) {}
   })
